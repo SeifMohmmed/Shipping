@@ -1,0 +1,29 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Shipping.Domain.Entities;
+public class Region
+{
+    [Key]
+    public int Id { get; set; }
+
+    [Required, MaxLength(100)]
+    public string Governorate { get; set; } = default!;
+
+    public bool IsDeleted { get; set; } = false;
+
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+    //------------- ICollection From CitySetting ------------------------------
+    public virtual ICollection<CitySetting> CitySettings { get; set; } = [];
+
+    //------------- ICollection From Branch ------------------------------
+
+    public virtual ICollection<Branch> Branches { get; set; } = [];
+
+    //------------- ICollection From Order ------------------------------
+    public virtual ICollection<Order> Orders { get; set; } = [];
+
+    //------------- ICollection From SpecialCourierRegion ------------------------------
+    public virtual ICollection<SpecialCourierRegion> SpecialCourierRegion { get; set; } = [];
+
+}
