@@ -23,13 +23,9 @@ public class Order
 
     public bool IsDeleted { get; set; } = false;
 
-    public OrderStatus Status { get; set; } //Enum
+    public OrderStatus Status { get; set; }
 
     public OrderType OrderTypes { get; set; }
-
-    public string MerchantId { get; set; } = default!;
-
-    public string EmployeeId { get; set; } = default!;
 
     //------------- CourierReport ------------------------------
 

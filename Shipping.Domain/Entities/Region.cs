@@ -3,7 +3,6 @@
 namespace Shipping.Domain.Entities;
 public class Region
 {
-    [Key]
     public int Id { get; set; }
 
     [Required, MaxLength(100)]
