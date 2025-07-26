@@ -7,4 +7,6 @@ public interface IUnitOfWork : IAsyncDisposable
     IGenericRepository<T, Tkey> GetRepository<T, Tkey>()
         where T : class where Tkey : IEquatable<Tkey>;
 
+    Task<int> CompleteAsync();
+
 }

@@ -1,5 +1,5 @@
+using Shipping.Application.Extentions;
 using Shipping.Infrastructure.Extentions;
-
 namespace Shipping.API
 {
     public class Program
@@ -15,8 +15,9 @@ namespace Shipping.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            //Add Connection to SQL Server
             builder.Services.AddInfrastructure(builder.Configuration);
+
+            builder.Services.AddApplication();
 
             var app = builder.Build();
 
