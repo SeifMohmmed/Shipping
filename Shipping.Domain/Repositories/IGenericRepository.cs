@@ -1,4 +1,4 @@
-﻿using Shipping.Domain.Pramter_Helper;
+﻿using Shipping.Domain.Helpers;
 
 namespace Shipping.Domain.Repositories;
 

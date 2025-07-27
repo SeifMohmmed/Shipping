@@ -1,5 +1,5 @@
 ﻿using Shipping.Application.Abstraction.Product.DTOs;
-using Shipping.Domain.Pramter_Helper;
+using Shipping.Domain.Helpers;
 
 namespace Shipping.Application.Abstraction.Product.Service;
 public interface IProductService

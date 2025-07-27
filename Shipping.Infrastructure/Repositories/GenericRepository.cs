@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Shipping.Domain.Pramter_Helper;
+using Shipping.Domain.Helpers;
 using Shipping.Domain.Repositories;
 using Shipping.Infrastructure.Persistence;
 

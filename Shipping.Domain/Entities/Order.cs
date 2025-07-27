@@ -26,8 +26,10 @@ public class Order
     public OrderStatus Status { get; set; }
 
     public OrderType OrderTypes { get; set; }
+    //----------- Ids From User ---------------------------------
+    public string MerchantId { get; set; } = string.Empty;
 
-    //------------- CourierReport ------------------------------
+    public string EmployeeId { get; set; } = string.Empty;
 
     public string CourierId { get; set; } = default!;
 
