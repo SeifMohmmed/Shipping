@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Shipping.Application.Abstraction;
+using Shipping.Application.Abstraction.CourierReport.Service;
 using Shipping.Application.Abstraction.Product.Service;
+using Shipping.Application.Services.CourierReportServices;
 using Shipping.Application.Services.ProductServices;
 using Shipping.Domain.Repositories;
 
@@ -16,13 +18,16 @@ public class ServiceManager : IServiceManager
     // Lazy<T> is a thread-safe way to create objects only when they are needed.
     // This can help improve performance by avoiding unnecessary instantiation of services that may not be used.
     private readonly Lazy<IProductService> _productService;
+    private readonly Lazy<ICourierReportService> _courierReportService;
 
     public ServiceManager(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _productService = new Lazy<IProductService>(() => new ProductService(unitOfWork, mapper));
+        _courierReportService = new Lazy<ICourierReportService>(() => new CourierReportService(unitOfWork, mapper));
 
     }
 
     // Properties to access the services
     public IProductService productService => _productService.Value;
+    public ICourierReportService courierReportService => _courierReportService.Value;
 }
