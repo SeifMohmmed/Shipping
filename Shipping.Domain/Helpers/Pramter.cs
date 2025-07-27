@@ -1,4 +1,4 @@
-﻿namespace Shipping.Domain.Pramter_Helper;
+﻿namespace Shipping.Domain.Helpers;
 public class Pramter
 {
     private const int MaxPageSize = 10;

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Shipping.Application.Abstraction;
 using Shipping.Application.Abstraction.Product.DTOs;
-using Shipping.Domain.Pramter_Helper;
+using Shipping.Domain.Helpers;
 
 namespace Shipping.API.Controllers;
 [Route("api/[controller]")]

@@ -2,7 +2,7 @@
 using Shipping.Application.Abstraction.Product.DTOs;
 using Shipping.Application.Abstraction.Product.Service;
 using Shipping.Domain.Entities;
-using Shipping.Domain.Pramter_Helper;
+using Shipping.Domain.Helpers;
 using Shipping.Domain.Repositories;
 
 namespace Shipping.Application.Services.ProductServices;
