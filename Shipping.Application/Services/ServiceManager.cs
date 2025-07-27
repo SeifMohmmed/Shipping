@@ -2,8 +2,10 @@
 using Shipping.Application.Abstraction;
 using Shipping.Application.Abstraction.CourierReport.Service;
 using Shipping.Application.Abstraction.Product.Service;
+using Shipping.Application.Abstraction.ShippingType.Serivce;
 using Shipping.Application.Services.CourierReportServices;
 using Shipping.Application.Services.ProductServices;
+using Shipping.Application.Services.ShippingTypeServices;
 using Shipping.Domain.Repositories;
 
 namespace Shipping.Application.Services;
@@ -19,15 +21,18 @@ public class ServiceManager : IServiceManager
     // This can help improve performance by avoiding unnecessary instantiation of services that may not be used.
     private readonly Lazy<IProductService> _productService;
     private readonly Lazy<ICourierReportService> _courierReportService;
+    private readonly Lazy<IShippingTypeService> _shippingTypeService;
 
     public ServiceManager(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _productService = new Lazy<IProductService>(() => new ProductService(unitOfWork, mapper));
         _courierReportService = new Lazy<ICourierReportService>(() => new CourierReportService(unitOfWork, mapper));
+        _shippingTypeService = new Lazy<IShippingTypeService>(() => new ShippingTypeService(unitOfWork, mapper));
 
     }
 
     // Properties to access the services
     public IProductService productService => _productService.Value;
     public ICourierReportService courierReportService => _courierReportService.Value;
+    public IShippingTypeService shippingTypeService => _shippingTypeService.Value;
 }
