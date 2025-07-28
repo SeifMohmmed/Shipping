@@ -2,14 +2,14 @@
 using Shipping.Application.Abstraction.CourierReport.DTOs;
 using Shipping.Application.Abstraction.CourierReport.Service;
 using Shipping.Domain.Entities;
-using Shipping.Domain.Pramter_Helper;
+using Shipping.Domain.Helpers;
 using Shipping.Domain.Repositories;
 
 namespace Shipping.Application.Services.CourierReportServices;
 public class CourierReportService(IUnitOfWork _unitOfWork,
     IMapper _mapper) : ICourierReportService
 {
-    public async Task<IEnumerable<GetAllCourierOrderCountDTO>> GetAllCourierReportAsync(Pramter pramter)
+    public async Task<IEnumerable<GetAllCourierOrderCountDTO>> GetAllCourierReportAsync(PaginationParameters pramter)
     {
         var courierReports = await _unitOfWork.GetRepository<CourierReport, int>().GetAllAsync(pramter);
 

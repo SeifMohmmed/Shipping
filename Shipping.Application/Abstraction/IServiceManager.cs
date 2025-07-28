@@ -1,4 +1,5 @@
 ﻿using Shipping.Application.Abstraction.CourierReport.Service;
+using Shipping.Application.Abstraction.Orders.Service;
 using Shipping.Application.Abstraction.Product.Service;
 using Shipping.Application.Abstraction.ShippingType.Serivce;
 
@@ -9,5 +10,5 @@ public interface IServiceManager
     public IProductService productService { get; }
     public ICourierReportService courierReportService { get; }
     public IShippingTypeService shippingTypeService { get; }
-
+    public IOrderService orderService { get; }
 }

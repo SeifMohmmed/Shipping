@@ -2,7 +2,7 @@
 using Shipping.Application.Abstraction.ShippingType.DTOs;
 using Shipping.Application.Abstraction.ShippingType.Serivce;
 using Shipping.Domain.Entities;
-using Shipping.Domain.Pramter_Helper;
+using Shipping.Domain.Helpers;
 using Shipping.Domain.Repositories;
 
 namespace Shipping.Application.Services.ShippingTypeServices;
@@ -31,7 +31,7 @@ public class ShippingTypeService(IUnitOfWork _unitOfWork,
     }
 
     //Get All Shipping Type
-    public async Task<IEnumerable<ShippingTypeDTO>> GetAllShippingTypeAsync(Pramter pramter)
+    public async Task<IEnumerable<ShippingTypeDTO>> GetAllShippingTypeAsync(PaginationParameters pramter)
     {
         return _mapper.Map<IEnumerable<ShippingTypeDTO>>(await _unitOfWork.GetRepository<ShippingType, int>().GetAllAsync(pramter));
     }

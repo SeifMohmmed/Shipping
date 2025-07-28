@@ -23,7 +23,7 @@ internal class GenericRepository<T, Tkey>(ApplicationDbContext context) : IGener
             context.Set<T>().Remove(entity);
     }
 
-    public async Task<IEnumerable<T>> GetAllAsync(Pramter pramter)
+    public async Task<IEnumerable<T>> GetAllAsync(PaginationParameters pramter)
     {
         if (pramter.PageSize is not null && pramter.PageNumber is not null)
         {

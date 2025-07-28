@@ -1,5 +1,5 @@
 ﻿namespace Shipping.Domain.Helpers;
-public class Pramter
+public class PaginationParameters
 {
     private const int MaxPageSize = 10;
     private int? pageSize;
