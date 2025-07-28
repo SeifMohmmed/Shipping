@@ -9,7 +9,7 @@ namespace Shipping.API.Controllers;
 public class ProductsController(IServiceManager _serviceManager) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAll([FromQuery] Pramter pramter)
+    public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAll([FromQuery] PaginationParameters pramter)
     {
         var products = await _serviceManager.productService.GetProductsAsync(pramter);
         return Ok(products);

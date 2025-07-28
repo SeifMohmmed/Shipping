@@ -1,4 +1,5 @@
-﻿using Shipping.Domain.Repositories;
+﻿using Shipping.Domain.Entities;
+using Shipping.Domain.Repositories;
 using Shipping.Infrastructure.Persistence;
 using System.Collections.Concurrent;
 
@@ -18,6 +19,21 @@ internal class UnitOfWork(ApplicationDbContext _context) : IUnitOfWork
         // Check If The Repository Already Exists In The Dictionary Or Not
         return (IGenericRepository<T, Tkey>)_repositories.GetOrAdd(typeof(T).Name,
             new GenericRepository<T, Tkey>(_context));
+    }
+
+    public IWeightSettingRepository GetWeightSettingRepository()
+    {
+        return (IWeightSettingRepository)_repositories.GetOrAdd(typeof(WeightSetting).Name, new WeightSettingRepository(_context));
+    }
+
+    public ISpecialCityCostRepository GetSpecialCityCostRepository()
+    {
+        return (ISpecialCityCostRepository)_repositories.GetOrAdd(typeof(SpecialCityCost).Name, new SpecialCityCostRepository(_context));
+    }
+
+    public IOrderRepository GetOrderRepository()
+    {
+        return (IOrderRepository)_repositories.GetOrAdd(typeof(Order).Name, new OrderRepository(_context));
     }
 
 }

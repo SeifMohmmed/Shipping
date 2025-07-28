@@ -39,7 +39,7 @@ public class ProductService(IUnitOfWork _unitOfWork,
     }
 
     //Get All Products
-    public async Task<IEnumerable<ProductDTO>> GetProductsAsync(Pramter pramter)
+    public async Task<IEnumerable<ProductDTO>> GetProductsAsync(PaginationParameters pramter)
     {
         return
             _mapper.Map<IEnumerable<ProductDTO>>(await _unitOfWork.GetRepository<Product, int>().GetAllAsync(pramter));

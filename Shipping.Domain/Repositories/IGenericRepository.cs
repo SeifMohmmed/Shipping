@@ -6,7 +6,7 @@ namespace Shipping.Domain.Repositories;
 public interface IGenericRepository<T, Tkey> where T : class where Tkey : IEquatable<Tkey>
 {
     // This Is CRUD Operations Methods   
-    Task<IEnumerable<T>> GetAllAsync(Pramter pramter);
+    Task<IEnumerable<T>> GetAllAsync(PaginationParameters pramter);
     Task<T?> GetByIdAsync(Tkey id);
     Task AddAsync(T entity);
     void UpdateAsync(T entity);

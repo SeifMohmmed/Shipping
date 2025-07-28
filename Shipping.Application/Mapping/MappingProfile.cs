@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Shipping.Application.Abstraction.CourierReport.DTOs;
+using Shipping.Application.Abstraction.Orders.DTO;
 using Shipping.Application.Abstraction.Product.DTOs;
 using Shipping.Application.Abstraction.ShippingType.DTOs;
 using Shipping.Domain.Entities;
@@ -39,6 +40,42 @@ public class MappingProfile : Profile
        .ReverseMap();
         #endregion
 
+        #region Configuration Of Order
+        CreateMap<Order, OrderWithProductsDTO>().AfterMap((src, dest) =>
+        {
+            dest.Branch = src.Branch?.Name;
+            dest.Region = src.Region?.Governorate;
+            dest.City = src.CitySetting?.Name;
+            dest.MerchantName = src.MerchantId;
+            dest.Status = src.Status.ToString();
+            dest.CustomerInfo = $"{src.CustomerName} {src.CustomerPhone}";
+            dest.OrderCost = src.OrderCost + src.ShippingCost;
+            dest.CourierId = src.CourierId;
+
+        }).ReverseMap();
+
+        CreateMap<Order, UpdateOrderDTO>().ReverseMap().ForMember(dest => dest.CitySettingId, opt => opt.MapFrom(src => src.City))
+        .ForMember(dest => dest.BranchId, opt => opt.MapFrom(src => src.Branch))
+        .ForMember(dest => dest.RegionId, opt => opt.MapFrom(src => src.Region))
+        .ForMember(dest => dest.ShippingTypeId, opt => opt.MapFrom(src => src.ShippingId))
+        .ForMember(dest => dest.PaymentType, opt => opt.MapFrom(src => src.PaymentType))
+        .ForMember(dest => dest.MerchantId, opt => opt.MapFrom(src => src.MerchantName))
+        .ForMember(dest => dest.Branch, opt => opt.Ignore())
+        .ForMember(dest => dest.Region, opt => opt.Ignore())
+        .ForMember(dest => dest.ShippingType, opt => opt.Ignore())
+        .ForMember(dest => dest.CitySetting, opt => opt.Ignore());
+
+        CreateMap<Order, AddOrderDTO>().ReverseMap().ForMember(dest => dest.CitySettingId, opt => opt.MapFrom(src => src.City))
+         .ForMember(dest => dest.BranchId, opt => opt.MapFrom(src => src.Branch))
+         .ForMember(dest => dest.RegionId, opt => opt.MapFrom(src => src.Region))
+         .ForMember(dest => dest.ShippingTypeId, opt => opt.MapFrom(src => src.ShippingId))
+         .ForMember(dest => dest.PaymentType, opt => opt.MapFrom(src => src.PaymentType))
+         .ForMember(dest => dest.MerchantId, opt => opt.MapFrom(src => src.MerchantName))
+         .ForMember(dest => dest.Branch, opt => opt.Ignore())
+         .ForMember(dest => dest.Region, opt => opt.Ignore())
+         .ForMember(dest => dest.ShippingType, opt => opt.Ignore())
+         .ForMember(dest => dest.CitySetting, opt => opt.Ignore());
+        #endregion
     }
 
 }
