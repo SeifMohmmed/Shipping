@@ -4,6 +4,7 @@ using Shipping.Application.Abstraction.CourierReport.DTOs;
 using Shipping.Application.Abstraction.Orders.DTO;
 using Shipping.Application.Abstraction.Product.DTOs;
 using Shipping.Application.Abstraction.ShippingType.DTOs;
+using Shipping.Application.Abstraction.SpecialCityCost.DTO;
 using Shipping.Domain.Entities;
 
 namespace Shipping.Application.Mapping;
@@ -89,6 +90,16 @@ public class MappingProfile : Profile
         CreateMap<BranchToAddDTO, Branch>().ReverseMap();
         CreateMap<BranchToUpdateDTO, Branch>().ReverseMap();
         #endregion
+
+        #region Configuration Of SpecialCityCost
+        CreateMap<SpecialCityCost, SpecialCityCostDTO>()
+           .ForMember(dest => dest.MerchantId, op => op.MapFrom(src => src.Merchant != null ? src.Merchant.Id : null))
+           .ForMember(des => des.MerchantName, op => op.MapFrom(src => src.Merchant != null ? src.Merchant.FullName : null))
+           .ForMember(des => des.CitySettingId, op => op.MapFrom(src => src.CitySetting != null ? src.CitySetting.Id : (int?)null))
+           .ForMember(des => des.CitySettingName, op => op.MapFrom(src => src.CitySetting != null ? src.CitySetting.Name : null))
+           .ReverseMap();
+        #endregion
+
     }
 
 }
