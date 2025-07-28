@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Shipping.Application.Abstraction;
+using Shipping.Application.Abstraction.Branch.Service;
 using Shipping.Application.Abstraction.CourierReport.Service;
 using Shipping.Application.Abstraction.Orders.Service;
 using Shipping.Application.Abstraction.Product.Service;
 using Shipping.Application.Abstraction.ShippingType.Serivce;
+using Shipping.Application.Services.BranchServices;
 using Shipping.Application.Services.CourierReportServices;
 using Shipping.Application.Services.OrderSerivces;
 using Shipping.Application.Services.ProductServices;
@@ -24,10 +26,12 @@ public class ServiceManager : IServiceManager
     // By using Lazy<T>, the services are created only when they are accessed, which can help improve performance.
     // Lazy<T> is a thread-safe way to create objects only when they are needed.
     // This can help improve performance by avoiding unnecessary instantiation of services that may not be used.
+
     private readonly Lazy<IProductService> _productService;
     private readonly Lazy<ICourierReportService> _courierReportService;
     private readonly Lazy<IShippingTypeService> _shippingTypeService;
     private readonly Lazy<IOrderService> _orderService;
+    private readonly Lazy<IBranchService> _branchService;
 
     public ServiceManager(IUnitOfWork unitOfWork, IMapper mapper, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
     {
@@ -35,7 +39,7 @@ public class ServiceManager : IServiceManager
         _courierReportService = new Lazy<ICourierReportService>(() => new CourierReportService(unitOfWork, mapper));
         _shippingTypeService = new Lazy<IShippingTypeService>(() => new ShippingTypeService(unitOfWork, mapper));
         _orderService = new Lazy<IOrderService>(() => new OrderService(unitOfWork, mapper, userManager, httpContextAccessor));
-
+        _branchService = new Lazy<IBranchService>(() => new BranchService(unitOfWork, mapper));
     }
 
     // Properties to access the services
@@ -43,4 +47,5 @@ public class ServiceManager : IServiceManager
     public ICourierReportService courierReportService => _courierReportService.Value;
     public IShippingTypeService shippingTypeService => _shippingTypeService.Value;
     public IOrderService orderService => _orderService.Value;
+    public IBranchService branchService => _branchService.Value;
 }

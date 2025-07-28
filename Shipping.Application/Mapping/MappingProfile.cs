@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Shipping.Application.Abstraction.Branch.DTO;
 using Shipping.Application.Abstraction.CourierReport.DTOs;
 using Shipping.Application.Abstraction.Orders.DTO;
 using Shipping.Application.Abstraction.Product.DTOs;
@@ -75,6 +76,18 @@ public class MappingProfile : Profile
          .ForMember(dest => dest.Region, opt => opt.Ignore())
          .ForMember(dest => dest.ShippingType, opt => opt.Ignore())
          .ForMember(dest => dest.CitySetting, opt => opt.Ignore());
+        #endregion
+
+        #region Configuration Of Branch
+
+        CreateMap<Branch, BranchDTO>()
+            .ForMember(dest => dest.RegionId, opt => opt.MapFrom(src => src.Region != null ? src.Region.Id : (int?)null))
+            .ForMember(dest => dest.RegionName, opt => opt.MapFrom(src => src.Region != null ? src.Region.Governorate : null))
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Users.Select(u => u.FullName).ToList()))
+            .ReverseMap();
+
+        CreateMap<BranchToAddDTO, Branch>().ReverseMap();
+        CreateMap<BranchToUpdateDTO, Branch>().ReverseMap();
         #endregion
     }
 
