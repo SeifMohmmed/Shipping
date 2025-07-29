@@ -6,8 +6,8 @@ public interface ICitySettingService
 {
     Task<IEnumerable<CitySettingDTO>> GetAllCitySettingAsync(PaginationParameters pramter);
     Task<CitySettingDTO> GetCitySettingAsync(int id);
-    Task AddAsync(CitySettingToAddDTO DTO);
-    Task UpdateAsync(CitySettingToUpdateDTO DTO);
+    Task<CitySettingDTO> AddAsync(CitySettingToAddDTO DTO);
+    Task UpdateAsync(int id, CitySettingToUpdateDTO DTO);
     Task DeleteAsync(int id);
     Task<IEnumerable<CitySettingDTO>> GetCityByGovernorateName(int regionId);
 

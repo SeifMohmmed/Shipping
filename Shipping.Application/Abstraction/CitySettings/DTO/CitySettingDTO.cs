@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 
 namespace Shipping.Application.Abstraction.CitySettings.DTO;
-public class CitySettingDTO
+public class CitySettingBaseDTO
 {
     public int Id { get; set; }
 
@@ -13,51 +13,29 @@ public class CitySettingDTO
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-    public int RegionId { get; set; }
-
-    public string? RegionName { get; set; }
-
-    //------------- List From User ------------------------------
-    public List<string> UsersName { get; set; } = [];
-
-    //------------- List From Order ------------------------------
-    public List<string> OrderCost { get; set; } = [];
-
-    //------------- List From SpecialPickup ------------------------------
-    public List<string> UsersThatHasSpecialCityCost { get; set; } = [];
-
-
+    public int? RegionId { get; set; }
 }
 
-public class CitySettingToAddDTO
+public class CitySettingDTO : CitySettingBaseDTO
 {
     [JsonIgnore]
     public int Id { get; set; }
 
-    public required string Name { get; set; }
+    public string? RegionName { get; set; }
 
-    public decimal StandardShippingCost { get; set; }
+    public List<string> Users { get; set; } = new();
 
-    public decimal PickUpShippingCost { get; set; }
+    public List<string> OrderCost { get; set; } = new();
 
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
-
-    public int? RegionId { get; set; }
-
+    public List<string> UsersThatHasSpecialCityCost { get; set; } = new();
 }
 
-public class CitySettingToUpdateDTO
+public class CitySettingToAddDTO : CitySettingBaseDTO
 {
-    public int Id { get; set; }
+    //public int Id { get; set; }
+}
 
-    public required string Name { get; set; }
-
-    public decimal StandardShippingCost { get; set; }
-
-    public decimal PickUpShippingCost { get; set; }
-
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
-
-    public int? RegionId { get; set; }
+public class CitySettingToUpdateDTO : CitySettingBaseDTO
+{
 
 }

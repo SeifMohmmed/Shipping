@@ -17,9 +17,14 @@ public class CitySettingController(IServiceManager serviceManager) : ControllerB
     }
 
     [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<CitySettingDTO>> GetById(int id)
     {
         var citySettings = await serviceManager.citySettingService.GetCitySettingAsync(id);
+
+        if (citySettings is null)
+            return NotFound($"citySetting with id {id} was not found.");
 
         return Ok(citySettings);
     }
@@ -50,9 +55,9 @@ public class CitySettingController(IServiceManager serviceManager) : ControllerB
         if (DTO is null)
             return BadRequest("Invalid CitySetting data");
 
-        await serviceManager.citySettingService.AddAsync(DTO);
+        var createdCitySetting = await serviceManager.citySettingService.AddAsync(DTO);
 
-        return CreatedAtAction(nameof(GetById), new { id = DTO.Id }, DTO);
+        return CreatedAtAction(nameof(GetById), new { id = createdCitySetting.Id }, DTO);
     }
 
     [HttpPut("{id}")]
@@ -61,11 +66,12 @@ public class CitySettingController(IServiceManager serviceManager) : ControllerB
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<CitySettingToUpdateDTO>> Update(int id, CitySettingToUpdateDTO DTO)
     {
-        if (DTO is null || id != DTO.Id)
+        if (DTO is null)
             return BadRequest("Invalid CitySetting data");
+
         try
         {
-            await serviceManager.citySettingService.UpdateAsync(DTO);
+            await serviceManager.citySettingService.UpdateAsync(id, DTO);
 
             return NoContent();
         }
