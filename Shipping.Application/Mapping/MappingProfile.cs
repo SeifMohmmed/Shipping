@@ -86,7 +86,7 @@ public class MappingProfile : Profile
         CreateMap<Branch, BranchDTO>()
             .ForMember(dest => dest.RegionId, opt => opt.MapFrom(src => src.Region != null ? src.Region.Id : (int?)null))
             .ForMember(dest => dest.RegionName, opt => opt.MapFrom(src => src.Region != null ? src.Region.Governorate : null))
-            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Users.Select(u => u.FullName).ToList()))
+            .ForMember(dest => dest.Users, opt => opt.MapFrom(src => src.Users.Select(u => u.FullName).ToList()))
             .ReverseMap();
 
         CreateMap<BranchToAddDTO, Branch>().ReverseMap();

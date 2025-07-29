@@ -7,6 +7,6 @@ public interface IBranchService
     Task<IEnumerable<BranchDTO>> GetBranchesAsync(PaginationParameters pramter);
     Task<BranchDTO> GetBranchAsync(int id);
     Task<BranchDTO> AddAsync(BranchToAddDTO DTO);
-    Task UpdateAsync(BranchToUpdateDTO DTO);
+    Task UpdateAsync(int id, BranchToUpdateDTO DTO);
     Task DeleteAsync(int id);
 }
