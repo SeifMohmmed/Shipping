@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using Shipping.Application.Abstraction.Branch.DTO;
+using Shipping.Application.Abstraction.CitySettings.DTO;
 using Shipping.Application.Abstraction.CourierReport.DTOs;
 using Shipping.Application.Abstraction.Orders.DTO;
 using Shipping.Application.Abstraction.Product.DTOs;
 using Shipping.Application.Abstraction.ShippingType.DTOs;
+using Shipping.Application.Abstraction.SpecialCityCost.DTO;
+using Shipping.Application.Abstraction.SpecialCourierRegion.DTO;
 using Shipping.Domain.Entities;
 
 namespace Shipping.Application.Mapping;
@@ -88,6 +91,36 @@ public class MappingProfile : Profile
 
         CreateMap<BranchToAddDTO, Branch>().ReverseMap();
         CreateMap<BranchToUpdateDTO, Branch>().ReverseMap();
+        #endregion
+
+        #region Configuration Of SpecialCityCost
+        CreateMap<SpecialCityCost, SpecialCityCostDTO>()
+           .ForMember(dest => dest.MerchantId, op => op.MapFrom(src => src.Merchant != null ? src.Merchant.Id : null))
+           .ForMember(des => des.MerchantName, op => op.MapFrom(src => src.Merchant != null ? src.Merchant.FullName : null))
+           .ForMember(des => des.CitySettingId, op => op.MapFrom(src => src.CitySetting != null ? src.CitySetting.Id : (int?)null))
+           .ForMember(des => des.CitySettingName, op => op.MapFrom(src => src.CitySetting != null ? src.CitySetting.Name : null))
+           .ReverseMap();
+        #endregion
+
+        #region Configuration Of CitySetting
+        CreateMap<CitySetting, CitySettingDTO>()
+         .ForMember(dest => dest.RegionId, opt => opt.MapFrom(src => src.RegionId))
+         .ForMember(dest => dest.RegionName, opt => opt.MapFrom(src => src.Region != null ? src.Region.Governorate : null))
+         .ForMember(dest => dest.UsersName, opt => opt.MapFrom(src => src.Users.Select(u => u.FullName).ToList()))
+         .ForMember(dest => dest.OrderCost, opt => opt.MapFrom(src => src.Orders.Select(u => u.OrderCost).ToList()))
+         .ForMember(dest => dest.UsersThatHasSpecialCityCost, opt => opt.MapFrom(src => src.SpecialPickups.Select(u => u.Merchant!.FullName).ToList()))
+         .ReverseMap();
+        CreateMap<CitySettingToAddDTO, CitySetting>().ReverseMap();
+        CreateMap<CitySettingToUpdateDTO, CitySetting>().ReverseMap();
+        #endregion
+
+        #region Configuration Of SpecialCourierRegion
+        CreateMap<SpecialCourierRegion, SpecialCourierRegionDTO>()
+             .ForMember(dest => dest.RegionId, opt => opt.MapFrom(src => src.RegionId))
+             .ForMember(dest => dest.RegionName, opt => opt.MapFrom(src => src.Region != null ? src.Region.Governorate : null))
+             .ForMember(dest => dest.CourierId, opt => opt.MapFrom(src => src.Courier != null ? src.Courier.Id : null))
+             .ForMember(dest => dest.CourierName, opt => opt.MapFrom(src => src.Courier != null ? src.Courier.FullName : null))
+             .ReverseMap();
         #endregion
     }
 

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Shipping.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using Shipping.Infrastructure.Persistence;
 namespace Shipping.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250729143847_AddCitySettingIdCol")]
+    partial class AddCitySettingIdCol
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -753,7 +756,7 @@ namespace Shipping.Infrastructure.Migrations
 
                     b.HasIndex("RegionId");
 
-                    b.ToTable("Branches", (string)null);
+                    b.ToTable("Branches");
                 });
 
             modelBuilder.Entity("Shipping.Domain.Entities.CitySetting", b =>
@@ -786,7 +789,7 @@ namespace Shipping.Infrastructure.Migrations
 
                     b.HasIndex("RegionId");
 
-                    b.ToTable("CitySettings", (string)null);
+                    b.ToTable("CitySettings");
                 });
 
             modelBuilder.Entity("Shipping.Domain.Entities.CourierReport", b =>
@@ -813,7 +816,7 @@ namespace Shipping.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("CourierReports", (string)null);
+                    b.ToTable("CourierReports");
                 });
 
             modelBuilder.Entity("Shipping.Domain.Entities.Order", b =>
@@ -912,7 +915,7 @@ namespace Shipping.Infrastructure.Migrations
 
                     b.HasIndex("ShippingTypeId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Shipping.Domain.Entities.Product", b =>
@@ -944,7 +947,7 @@ namespace Shipping.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("Shipping.Domain.Entities.Region", b =>
@@ -968,7 +971,7 @@ namespace Shipping.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Regions", (string)null);
+                    b.ToTable("Regions");
                 });
 
             modelBuilder.Entity("Shipping.Domain.Entities.ShippingType", b =>
@@ -995,7 +998,7 @@ namespace Shipping.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ShippingTypes", (string)null);
+                    b.ToTable("ShippingTypes");
                 });
 
             modelBuilder.Entity("Shipping.Domain.Entities.SpecialCityCost", b =>
@@ -1029,7 +1032,7 @@ namespace Shipping.Infrastructure.Migrations
 
                     b.HasIndex("MerchantId");
 
-                    b.ToTable("SpecialCityCosts", (string)null);
+                    b.ToTable("SpecialCityCosts");
                 });
 
             modelBuilder.Entity("Shipping.Domain.Entities.SpecialCourierRegion", b =>
@@ -1053,7 +1056,7 @@ namespace Shipping.Infrastructure.Migrations
 
                     b.HasIndex("RegionId");
 
-                    b.ToTable("SpecialCourierRegions", (string)null);
+                    b.ToTable("SpecialCourierRegions");
                 });
 
             modelBuilder.Entity("Shipping.Domain.Entities.WeightSetting", b =>
@@ -1081,7 +1084,7 @@ namespace Shipping.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("WeightSettings", (string)null);
+                    b.ToTable("WeightSettings");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
