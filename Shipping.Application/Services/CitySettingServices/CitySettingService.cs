@@ -18,10 +18,15 @@ internal class CitySettingService(IUnitOfWork unitOfWork,
     => mapper.Map<CitySettingDTO>(await unitOfWork.GetRepository<CitySetting, int>().GetByIdAsync(id));
 
     //Add City
-    public async Task AddAsync(CitySettingToAddDTO DTO)
+    public async Task<CitySettingDTO> AddAsync(CitySettingToAddDTO DTO)
     {
-        await unitOfWork.GetRepository<CitySetting, int>().AddAsync(mapper.Map<CitySetting>(DTO));
+        var entity = mapper.Map<CitySetting>(DTO);
+
+        await unitOfWork.GetRepository<CitySetting, int>().AddAsync(entity);
+
         await unitOfWork.CompleteAsync();
+
+        return mapper.Map<CitySettingDTO>(entity);
     }
 
     //Delete City
@@ -39,13 +44,13 @@ internal class CitySettingService(IUnitOfWork unitOfWork,
     }
 
     //Update City
-    public async Task UpdateAsync(CitySettingToUpdateDTO DTO)
+    public async Task UpdateAsync(int id, CitySettingToUpdateDTO DTO)
     {
         var citySettingRepo = unitOfWork.GetCityRepository();
-        var existingCitySetting = await citySettingRepo.GetByIdAsync(DTO.Id);
+        var existingCitySetting = await citySettingRepo.GetByIdAsync(id);
 
         if (existingCitySetting is null)
-            throw new KeyNotFoundException($"CitySetting with ID {DTO.Id} not found.");
+            throw new KeyNotFoundException($"CitySetting with ID {id} not found.");
 
         mapper.Map(DTO, existingCitySetting);
 
