@@ -106,7 +106,7 @@ public class MappingProfile : Profile
         CreateMap<CitySetting, CitySettingDTO>()
          .ForMember(dest => dest.RegionId, opt => opt.MapFrom(src => src.RegionId))
          .ForMember(dest => dest.RegionName, opt => opt.MapFrom(src => src.Region != null ? src.Region.Governorate : null))
-         .ForMember(dest => dest.UsersName, opt => opt.MapFrom(src => src.Users.Select(u => u.FullName).ToList()))
+         .ForMember(dest => dest.Users, opt => opt.MapFrom(src => src.Users.Select(u => u.FullName).ToList()))
          .ForMember(dest => dest.OrderCost, opt => opt.MapFrom(src => src.Orders.Select(u => u.OrderCost).ToList()))
          .ForMember(dest => dest.UsersThatHasSpecialCityCost, opt => opt.MapFrom(src => src.SpecialPickups.Select(u => u.Merchant!.FullName).ToList()))
          .ReverseMap();
