@@ -25,4 +25,7 @@ public class CitySetting
     //-------------  SpecialPickup ------------------------------
     public virtual ICollection<SpecialCityCost> SpecialPickups { get; set; } = [];
 
+    //------------- ICollection Users ------------------------------
+    public virtual ICollection<ApplicationUser> Users { get; set; } = [];
+
 }
