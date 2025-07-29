@@ -12,6 +12,8 @@ public interface IUnitOfWork : IAsyncDisposable
 
     IOrderRepository GetOrderRepository();
 
+    ICityRepository GetCityRepository();
+
     Task<int> CompleteAsync();
 
 }

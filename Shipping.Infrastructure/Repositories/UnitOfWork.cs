@@ -35,5 +35,8 @@ internal class UnitOfWork(ApplicationDbContext _context) : IUnitOfWork
     {
         return (IOrderRepository)_repositories.GetOrAdd(typeof(Order).Name, new OrderRepository(_context));
     }
-
+    public ICityRepository GetCityRepository()
+    {
+        return (ICityRepository)_repositories.GetOrAdd(typeof(CitySetting).Name, new CityRepository(_context));
+    }
 }
