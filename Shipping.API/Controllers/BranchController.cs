@@ -17,17 +17,21 @@ public class BranchController(IServiceManager serviceManager) : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<BranchDTO>> GetById(int id)
     {
         var branch = await serviceManager.branchService.GetBranchAsync(id);
 
         if (branch is null)
-            return NotFound();
+            return NotFound($"Branch with id {id} was not found.");
 
         return Ok(branch);
     }
 
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<ActionResult<BranchDTO>> Add([FromBody] BranchToAddDTO DTO)
     {
         if (DTO is null)
@@ -45,11 +49,13 @@ public class BranchController(IServiceManager serviceManager) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<BranchDTO>> Update(int id, [FromBody] BranchToUpdateDTO DTO)
     {
-        if (DTO is null || id != DTO.Id)
+
+        if (DTO is null)
             return BadRequest("Invalid branch data");
+
         try
         {
-            await serviceManager.branchService.UpdateAsync(DTO);
+            await serviceManager.branchService.UpdateAsync(id, DTO);
 
             return NoContent();
         }

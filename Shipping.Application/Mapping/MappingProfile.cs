@@ -6,6 +6,7 @@ using Shipping.Application.Abstraction.Orders.DTO;
 using Shipping.Application.Abstraction.Product.DTOs;
 using Shipping.Application.Abstraction.ShippingType.DTOs;
 using Shipping.Application.Abstraction.SpecialCityCost.DTO;
+using Shipping.Application.Abstraction.SpecialCourierRegion.DTO;
 using Shipping.Domain.Entities;
 
 namespace Shipping.Application.Mapping;
@@ -85,7 +86,7 @@ public class MappingProfile : Profile
         CreateMap<Branch, BranchDTO>()
             .ForMember(dest => dest.RegionId, opt => opt.MapFrom(src => src.Region != null ? src.Region.Id : (int?)null))
             .ForMember(dest => dest.RegionName, opt => opt.MapFrom(src => src.Region != null ? src.Region.Governorate : null))
-            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Users.Select(u => u.FullName).ToList()))
+            .ForMember(dest => dest.Users, opt => opt.MapFrom(src => src.Users.Select(u => u.FullName).ToList()))
             .ReverseMap();
 
         CreateMap<BranchToAddDTO, Branch>().ReverseMap();
@@ -105,7 +106,7 @@ public class MappingProfile : Profile
         CreateMap<CitySetting, CitySettingDTO>()
          .ForMember(dest => dest.RegionId, opt => opt.MapFrom(src => src.RegionId))
          .ForMember(dest => dest.RegionName, opt => opt.MapFrom(src => src.Region != null ? src.Region.Governorate : null))
-         .ForMember(dest => dest.Users, opt => opt.MapFrom(src => src.Users.Select(u => u.FullName).ToList()))
+         .ForMember(dest => dest.UsersName, opt => opt.MapFrom(src => src.Users.Select(u => u.FullName).ToList()))
          .ForMember(dest => dest.OrderCost, opt => opt.MapFrom(src => src.Orders.Select(u => u.OrderCost).ToList()))
          .ForMember(dest => dest.UsersThatHasSpecialCityCost, opt => opt.MapFrom(src => src.SpecialPickups.Select(u => u.Merchant!.FullName).ToList()))
          .ReverseMap();
@@ -113,6 +114,14 @@ public class MappingProfile : Profile
         CreateMap<CitySettingToUpdateDTO, CitySetting>().ReverseMap();
         #endregion
 
+        #region Configuration Of SpecialCourierRegion
+        CreateMap<SpecialCourierRegion, SpecialCourierRegionDTO>()
+             .ForMember(dest => dest.RegionId, opt => opt.MapFrom(src => src.RegionId))
+             .ForMember(dest => dest.RegionName, opt => opt.MapFrom(src => src.Region != null ? src.Region.Governorate : null))
+             .ForMember(dest => dest.CourierId, opt => opt.MapFrom(src => src.Courier != null ? src.Courier.Id : null))
+             .ForMember(dest => dest.CourierName, opt => opt.MapFrom(src => src.Courier != null ? src.Courier.FullName : null))
+             .ReverseMap();
+        #endregion
     }
 
 }
