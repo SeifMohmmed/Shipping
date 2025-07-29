@@ -3,6 +3,7 @@ using Shipping.Application.Abstraction.CitySettings.Service;
 using Shipping.Application.Abstraction.CourierReport.Service;
 using Shipping.Application.Abstraction.Orders.Service;
 using Shipping.Application.Abstraction.Product.Service;
+using Shipping.Application.Abstraction.Region.Service;
 using Shipping.Application.Abstraction.ShippingType.Serivce;
 using Shipping.Application.Abstraction.SpecialCityCost.Service;
 using Shipping.Application.Abstraction.SpecialCourierRegion.Serivce;
@@ -19,4 +20,5 @@ public interface IServiceManager
     public ISpecialCityCostService specialCityCostService { get; }
     public ICitySettingService citySettingService { get; }
     public ISpecialCourierRegionService specialCourierRegionService { get; }
+    public IRegionService regionService { get; }
 }

@@ -7,6 +7,7 @@ using Shipping.Application.Abstraction.CitySettings.Service;
 using Shipping.Application.Abstraction.CourierReport.Service;
 using Shipping.Application.Abstraction.Orders.Service;
 using Shipping.Application.Abstraction.Product.Service;
+using Shipping.Application.Abstraction.Region.Service;
 using Shipping.Application.Abstraction.ShippingType.Serivce;
 using Shipping.Application.Abstraction.SpecialCityCost.Service;
 using Shipping.Application.Abstraction.SpecialCourierRegion.Serivce;
@@ -15,6 +16,7 @@ using Shipping.Application.Services.CitySettingServices;
 using Shipping.Application.Services.CourierReportServices;
 using Shipping.Application.Services.OrderSerivces;
 using Shipping.Application.Services.ProductServices;
+using Shipping.Application.Services.RegionServices;
 using Shipping.Application.Services.ShippingTypeServices;
 using Shipping.Application.Services.SpecialCityCostServices;
 using Shipping.Application.Services.SpecialCourierRegionServices;
@@ -41,6 +43,7 @@ public class ServiceManager : IServiceManager
     private readonly Lazy<ISpecialCityCostService> _specialCityCostService;
     private readonly Lazy<ICitySettingService> _citySettingService;
     private readonly Lazy<ISpecialCourierRegionService> _specialCourierRegionService;
+    private readonly Lazy<IRegionService> _regionService;
 
     public ServiceManager(IUnitOfWork unitOfWork, IMapper mapper, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
     {
@@ -52,6 +55,7 @@ public class ServiceManager : IServiceManager
         _specialCityCostService = new Lazy<ISpecialCityCostService>(() => new SpecialCityCostService(unitOfWork, mapper));
         _citySettingService = new Lazy<ICitySettingService>(() => new CitySettingService(unitOfWork, mapper));
         _specialCourierRegionService = new Lazy<ISpecialCourierRegionService>(() => new SpecialCourierRegionService(unitOfWork, mapper));
+        _regionService = new Lazy<IRegionService>(() => new RegionService(unitOfWork, mapper));
     }
 
     // Properties to access the services
@@ -63,4 +67,5 @@ public class ServiceManager : IServiceManager
     public ISpecialCityCostService specialCityCostService => _specialCityCostService.Value;
     public ICitySettingService citySettingService => _citySettingService.Value;
     public ISpecialCourierRegionService specialCourierRegionService => _specialCourierRegionService.Value;
+    public IRegionService regionService => _regionService.Value;
 }

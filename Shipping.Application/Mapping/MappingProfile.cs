@@ -4,6 +4,7 @@ using Shipping.Application.Abstraction.CitySettings.DTO;
 using Shipping.Application.Abstraction.CourierReport.DTOs;
 using Shipping.Application.Abstraction.Orders.DTO;
 using Shipping.Application.Abstraction.Product.DTOs;
+using Shipping.Application.Abstraction.Region.DTO;
 using Shipping.Application.Abstraction.ShippingType.DTOs;
 using Shipping.Application.Abstraction.SpecialCityCost.DTO;
 using Shipping.Application.Abstraction.SpecialCourierRegion.DTO;
@@ -120,6 +121,16 @@ public class MappingProfile : Profile
              .ForMember(dest => dest.RegionName, opt => opt.MapFrom(src => src.Region != null ? src.Region.Governorate : null))
              .ForMember(dest => dest.CourierId, opt => opt.MapFrom(src => src.Courier != null ? src.Courier.Id : null))
              .ForMember(dest => dest.CourierName, opt => opt.MapFrom(src => src.Courier != null ? src.Courier.FullName : null))
+             .ReverseMap();
+        #endregion
+
+        #region Configration Of Region
+        CreateMap<Region, RegionDTO>()
+             .ForMember(dest => dest.CityName, op => op.MapFrom(src => src.CitySettings.Select(c => c.Name)))
+             .ReverseMap();
+
+        CreateMap<Region, RegionToAddDTO>()
+             .ForMember(dest => dest.CityName, op => op.MapFrom(src => src.CitySettings.Select(c => c.Name)))
              .ReverseMap();
         #endregion
     }
