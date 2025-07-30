@@ -19,5 +19,8 @@ public class Branch
     [ForeignKey(nameof(Region))]
     public int? RegionId { get; set; }
 
-    public virtual Region? Regions { get; set; }
+    public virtual Region? Region { get; set; }
+
+    public virtual ICollection<ApplicationUser> Users { get; set; } = [];
+
 }

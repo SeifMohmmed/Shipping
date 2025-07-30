@@ -20,30 +20,34 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
 
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<OrderWithProductsDTO>> Get(int id)
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<OrderWithProductsDTO>> GetById(int id)
     {
         var order = await _serviceManager.orderService.GetOrderAsync(id);
 
         if (order is null)
-            return NotFound();
+            return NotFound($"Order with id {id} was not found.");
 
         return Ok(order);
     }
 
 
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<AddOrderDTO>> AddOrder(AddOrderDTO DTO)
     {
-        if (DTO is null)
-            return BadRequest("Invalid Order data");
+        var order = await _serviceManager.orderService.AddAsync(DTO);
 
-        await _serviceManager.orderService.AddAsync(DTO);
-
-        return Ok();
+        return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
     }
 
 
     [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> UpdateOrder(int id, [FromBody] UpdateOrderDTO DTO)
     {
         if (DTO is null || id != DTO.Id)
@@ -51,7 +55,7 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
 
         try
         {
-            await _serviceManager.orderService.UpdateAsync(DTO);
+            await _serviceManager.orderService.UpdateAsync(id, DTO);
             return NoContent();
         }
         catch (KeyNotFoundException ex)
@@ -63,6 +67,8 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
 
 
     [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> DeleteOrder(int id)
     {
         try
@@ -79,6 +85,8 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
 
 
     [HttpGet("GetAllOrderByStatus")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAllOrderByStatus(OrderStatus status, [FromQuery] PaginationParameters pramter)
     {
         try
@@ -92,7 +100,7 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
         }
         catch (KeyNotFoundException ex)
         {
-            return BadRequest(ex.Message);
+            return NotFound(ex.Message);
         }
     }
 
@@ -108,6 +116,9 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
 
 
     [HttpPost("ChangeOrderStatusToPending/{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ChangeOrderStatusToPending(int id)
     {
         try
@@ -123,6 +134,9 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
 
 
     [HttpPost("ChangeOrderStatusToDeclined/{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ChangeOrderStatusToDeclined(int id)
     {
         try
@@ -138,6 +152,9 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
 
 
     [HttpPost("UpdateStatus/{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateStatus(int id, OrderStatus status)
     {
         try
@@ -153,27 +170,26 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
     }
 
 
-    [HttpPost("AssignOrderToCourier/{OrderId}/{courierId}")]
+    [HttpPost("{OrderId}/AssignOrderToCourier/{courierId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AssignOrderToCourier(int OrderId, string courierId)
     {
         try
         {
-            if (string.IsNullOrEmpty(courierId))
-            {
-                return BadRequest("CouierId is required");
-            }
+        if (string.IsNullOrEmpty(courierId))
+            return NotFound($"courierId with id {courierId} was not found.");
 
+        try
+        {
             await _serviceManager.orderService.AssignOrderToCourier(OrderId, courierId);
             return NoContent();
         }
 
-        catch (KeyNotFoundException)
+        catch (KeyNotFoundException ex)
         {
-            return NotFound("Order Not Found");
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
+            return NotFound(ex.Message);
         }
 
     }
