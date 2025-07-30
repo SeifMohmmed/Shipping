@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Shipping.Application.Abstraction;
 using Shipping.Application.Abstraction.Product.DTOs;
-using Shipping.Domain.Pramter_Helper;
+using Shipping.Domain.Helpers;
 
 namespace Shipping.API.Controllers;
 [Route("api/[controller]")]
@@ -9,7 +9,7 @@ namespace Shipping.API.Controllers;
 public class ProductsController(IServiceManager _serviceManager) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAll([FromQuery] Pramter pramter)
+    public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAll([FromQuery] PaginationParameters pramter)
     {
         var products = await _serviceManager.productService.GetProductsAsync(pramter);
         return Ok(products);

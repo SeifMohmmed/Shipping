@@ -2,7 +2,7 @@
 using Shipping.Application.Abstraction.Product.DTOs;
 using Shipping.Application.Abstraction.Product.Service;
 using Shipping.Domain.Entities;
-using Shipping.Domain.Pramter_Helper;
+using Shipping.Domain.Helpers;
 using Shipping.Domain.Repositories;
 
 namespace Shipping.Application.Services.ProductServices;
@@ -39,7 +39,7 @@ public class ProductService(IUnitOfWork _unitOfWork,
     }
 
     //Get All Products
-    public async Task<IEnumerable<ProductDTO>> GetProductsAsync(Pramter pramter)
+    public async Task<IEnumerable<ProductDTO>> GetProductsAsync(PaginationParameters pramter)
     {
         return
             _mapper.Map<IEnumerable<ProductDTO>>(await _unitOfWork.GetRepository<Product, int>().GetAllAsync(pramter));
