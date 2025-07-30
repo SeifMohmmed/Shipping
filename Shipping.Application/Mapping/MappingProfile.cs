@@ -23,6 +23,8 @@ public class MappingProfile : Profile
 
         #region Configuration of CourierReport
         CreateMap<CourierReport, CourierReportDTO>()
+          .ForMember(dest => dest.CourierName, opt => opt.MapFrom(src => src.Courier != null ? src.Courier.FullName : string.Empty))
+          .ForMember(dest => dest.MerchantId, opt => opt.MapFrom(src => src.Order.MerchantId))
           .ForMember(dest => dest.Area, opt => opt.MapFrom(src => src.Order != null && src.Order.CitySetting != null ? src.Order.CitySetting.Name : string.Empty))
           .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Order != null ? src.Order.CustomerName : string.Empty))
           .ForMember(dest => dest.CustomerPhone, opt => opt.MapFrom(src => src.Order != null ? src.Order.CustomerPhone : string.Empty))
