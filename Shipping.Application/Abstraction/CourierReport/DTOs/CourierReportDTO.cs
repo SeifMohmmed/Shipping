@@ -14,4 +14,6 @@ public class CourierReportDTO
     public string? Notes { get; set; }
     public required string orderStatus { get; set; }
     public decimal Amount { get; set; }
+    public string MerchantId { get; set; } = string.Empty;
+
 }
