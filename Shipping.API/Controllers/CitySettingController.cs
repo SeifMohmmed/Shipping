@@ -36,7 +36,7 @@ public class CitySettingController(IServiceManager serviceManager) : ControllerB
     {
         try
         {
-            var result = await serviceManager.citySettingService.GetCityByGovernorateName(regionId);
+            var result = await serviceManager.citySettingService.GetCitiesByRegionId(regionId);
 
             return Ok(result);
         }
@@ -64,7 +64,7 @@ public class CitySettingController(IServiceManager serviceManager) : ControllerB
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<CitySettingToUpdateDTO>> Update(int id, CitySettingToUpdateDTO DTO)
+    public async Task<IActionResult> Update(int id, CitySettingToUpdateDTO DTO)
     {
         if (DTO is null)
             return BadRequest("Invalid CitySetting data");

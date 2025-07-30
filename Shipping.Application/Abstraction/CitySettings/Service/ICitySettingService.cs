@@ -9,6 +9,6 @@ public interface ICitySettingService
     Task<CitySettingDTO> AddAsync(CitySettingToAddDTO DTO);
     Task UpdateAsync(int id, CitySettingToUpdateDTO DTO);
     Task DeleteAsync(int id);
-    Task<IEnumerable<CitySettingDTO>> GetCityByGovernorateName(int regionId);
+    Task<IEnumerable<CitySettingDTO>> GetCitiesByRegionId(int regionId);
 
 }
