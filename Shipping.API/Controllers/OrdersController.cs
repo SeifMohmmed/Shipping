@@ -9,7 +9,6 @@ namespace Shipping.API.Controllers;
 [ApiController]
 public class OrdersController(IServiceManager _serviceManager) : ControllerBase
 {
-
     [HttpGet]
     public async Task<ActionResult<IEnumerable<OrderWithProductsDTO>>> GetAll([FromQuery] PaginationParameters pramter)
     {
@@ -50,9 +49,6 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> UpdateOrder(int id, [FromBody] UpdateOrderDTO DTO)
     {
-        if (DTO is null || id != DTO.Id)
-            return BadRequest("Invalid branch data.");
-
         try
         {
             await _serviceManager.orderService.UpdateAsync(id, DTO);
@@ -176,8 +172,6 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AssignOrderToCourier(int OrderId, string courierId)
     {
-        try
-        {
         if (string.IsNullOrEmpty(courierId))
             return NotFound($"courierId with id {courierId} was not found.");
 
@@ -191,8 +185,5 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
         {
             return NotFound(ex.Message);
         }
-
     }
-
-
 }

@@ -15,20 +15,6 @@ public class OrderService(IUnitOfWork _unitOfWork,
     UserManager<ApplicationUser> _userManager,
     IHttpContextAccessor _httpContextAccessor) : IOrderService
 {
-    // Method to get the merchant name for each order
-    private async Task<IEnumerable<OrderWithProductsDTO>> GetMerchantName(IEnumerable<Order> orders)
-    {
-        var ordersDTO = _mapper.Map<IEnumerable<OrderWithProductsDTO>>(orders);
-        foreach (var order in ordersDTO)
-        {
-            var MerchantName = await _userManager.FindByIdAsync(order.MerchantName);
-            order.MerchantName = MerchantName?.FullName ?? "اسم التاجر غير متاح";
-        }
-        return ordersDTO;
-    }
-    //--------------------------------------------------------------------------
-
-
     // Get all orders
     public async Task<IEnumerable<OrderWithProductsDTO>> GetOrdersAsync(PaginationParameters pramter)
     {
@@ -94,7 +80,6 @@ public class OrderService(IUnitOfWork _unitOfWork,
     {
         DTO.ShippingCost = await CalculateShippingCost(DTO);
 
-        DTO.ShippingCost = shippingCost;
         var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext!.User);
 
         if (currentUser is not null && await _userManager.IsInRoleAsync(currentUser, DefaultRole.Merchant))
