@@ -23,6 +23,8 @@ public class MappingProfile : Profile
 
         #region Configuration of CourierReport
         CreateMap<CourierReport, CourierReportDTO>()
+          .ForMember(dest => dest.CourierName, opt => opt.MapFrom(src => src.Courier != null ? src.Courier.FullName : string.Empty))
+          .ForMember(dest => dest.MerchantId, opt => opt.MapFrom(src => src.Order.MerchantId))
           .ForMember(dest => dest.Area, opt => opt.MapFrom(src => src.Order != null && src.Order.CitySetting != null ? src.Order.CitySetting.Name : string.Empty))
           .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Order != null ? src.Order.CustomerName : string.Empty))
           .ForMember(dest => dest.CustomerPhone, opt => opt.MapFrom(src => src.Order != null ? src.Order.CustomerPhone : string.Empty))
@@ -106,7 +108,7 @@ public class MappingProfile : Profile
         CreateMap<CitySetting, CitySettingDTO>()
          .ForMember(dest => dest.RegionId, opt => opt.MapFrom(src => src.RegionId))
          .ForMember(dest => dest.RegionName, opt => opt.MapFrom(src => src.Region != null ? src.Region.Governorate : null))
-         .ForMember(dest => dest.UsersName, opt => opt.MapFrom(src => src.Users.Select(u => u.FullName).ToList()))
+         .ForMember(dest => dest.Users, opt => opt.MapFrom(src => src.Users.Select(u => u.FullName).ToList()))
          .ForMember(dest => dest.OrderCost, opt => opt.MapFrom(src => src.Orders.Select(u => u.OrderCost).ToList()))
          .ForMember(dest => dest.UsersThatHasSpecialCityCost, opt => opt.MapFrom(src => src.SpecialPickups.Select(u => u.Merchant!.FullName).ToList()))
          .ReverseMap();

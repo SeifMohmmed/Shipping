@@ -1,10 +1,7 @@
-﻿using System.Text.Json.Serialization;
-
 namespace Shipping.Application.Abstraction.CitySettings.DTO;
-public class CitySettingDTO
-{
-    public int Id { get; set; }
 
+public class CitySettingBaseDTO
+{
     public required string Name { get; set; }
 
     public decimal StandardShippingCost { get; set; }
@@ -13,51 +10,28 @@ public class CitySettingDTO
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-    public int RegionId { get; set; }
+    public int? RegionId { get; set; }
+}
+
+public class CitySettingDTO : CitySettingBaseDTO
+{
+    public int Id { get; set; }
 
     public string? RegionName { get; set; }
 
-    //------------- List From User ------------------------------
-    public List<string> UsersName { get; set; } = [];
+    public List<string> Users { get; set; } = new();
 
-    //------------- List From Order ------------------------------
-    public List<string> OrderCost { get; set; } = [];
+    public List<string> OrderCost { get; set; } = new();
 
-    //------------- List From SpecialPickup ------------------------------
-    public List<string> UsersThatHasSpecialCityCost { get; set; } = [];
+    public List<string> UsersThatHasSpecialCityCost { get; set; } = new();
+}
 
+public class CitySettingToAddDTO : CitySettingBaseDTO
+{
 
 }
 
-public class CitySettingToAddDTO
+public class CitySettingToUpdateDTO : CitySettingBaseDTO
 {
-    [JsonIgnore]
-    public int Id { get; set; }
-
-    public required string Name { get; set; }
-
-    public decimal StandardShippingCost { get; set; }
-
-    public decimal PickUpShippingCost { get; set; }
-
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
-
-    public int? RegionId { get; set; }
-
-}
-
-public class CitySettingToUpdateDTO
-{
-    public int Id { get; set; }
-
-    public required string Name { get; set; }
-
-    public decimal StandardShippingCost { get; set; }
-
-    public decimal PickUpShippingCost { get; set; }
-
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
-
-    public int? RegionId { get; set; }
 
 }

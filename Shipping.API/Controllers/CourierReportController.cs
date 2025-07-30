@@ -18,11 +18,19 @@ public class CourierReportController(IServiceManager _serviceManager) : Controll
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<GetAllCourierOrderCountDTO>> GetBranch(int id)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<GetAllCourierOrderCountDTO>> GetBranch(int id, [FromQuery] PaginationParameters parameter)
     {
-        var CourierReport = await _serviceManager.courierReportService.GetCourierReportAsync(id);
-
-        return Ok(CourierReport);
+        try
+        {
+            var CourierReport = await _serviceManager.courierReportService.GetCourierReportAsync(id, parameter);
+            return Ok(CourierReport);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 
 }
