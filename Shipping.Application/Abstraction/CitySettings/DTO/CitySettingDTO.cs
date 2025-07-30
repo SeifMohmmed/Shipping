@@ -1,4 +1,5 @@
-﻿namespace Shipping.Application.Abstraction.CitySettings.DTO;
+namespace Shipping.Application.Abstraction.CitySettings.DTO;
+
 public class CitySettingBaseDTO
 {
     public required string Name { get; set; }
