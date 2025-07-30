@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Shipping.Application.Abstraction.OrderReport.DTO;
 using Shipping.Application.Abstraction.Orders.DTO;
 using Shipping.Application.Abstraction.Orders.Service;
 using Shipping.Domain.Entities;
@@ -97,28 +98,21 @@ public class OrderService(IUnitOfWork _unitOfWork,
 
         var orderEntity = _mapper.Map<Order>(DTO);
         await _unitOfWork.GetOrderRepository().AddAsync(orderEntity);
-        await _unitOfWork.CompleteAsync();
-
-        // Map the saved entity to the DTO before returning
-        var orderDTO = _mapper.Map<OrderWithProductsDTO>(orderEntity);
+        await _unitOfWork.CompleteAsync(); // Save the Order to get its Id
 
 
-        return orderDTO;
+        //Create the order report When Add New order
+        var orderReportDto = new OrderReportDTO
+        {
+            OrderId = orderEntity.Id,
+            ReportDate = DateTime.UtcNow,
+            //ReportDetails = $"New order (ID: {orderEntity.Id}) was created by merchant '{currentUser.UserName}' for customer '{DTO.CustomerName}' with status '{DTO.status}' on {DateTime.UtcNow:yyyy-MM-dd HH:mm} UTC."
+        };
 
-        #region TODO : Adding Order Report
-        // Retrieve the saved order to get the correct ID
-        //var savedOrder = await _unitOfWork.GetOrderRepository().GetByIdAsync(orderEntity.Id);
+        await _unitOfWork.GetOrderReportRepository().AddAsync(_mapper.Map<OrderReport>(orderReportDto));
+        await _unitOfWork.CompleteAsync(); // Save the OrderReport
 
-        // Create the order report When Add New order
-        //var orderReportDto = new OrderReportDTO
-        //{
-        //    OrderId = savedOrder.Id,
-        //    ReportDate = DateTime.UtcNow
-        //};
-
-        //await _unitOfWork.GetOrderReportRepository().AddAsync(_mapper.Map<OrderReport>(orderReportDto));
-        //await _unitOfWork.CompleteAsync();
-        #endregion
+        return _mapper.Map<OrderWithProductsDTO>(orderEntity);
 
     }
 

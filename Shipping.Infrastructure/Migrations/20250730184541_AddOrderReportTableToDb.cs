@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Shipping.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class addOrderReportTable : Migration
+    public partial class AddOrderReportTableToDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -37,28 +37,28 @@ namespace Shipping.Infrastructure.Migrations
                 keyColumn: "Id",
                 keyValue: "01961d25-b4da-7184-a2a8-765486bd4857",
                 column: "CreatedAt",
-                value: new DateTime(2025, 7, 27, 23, 50, 5, 597, DateTimeKind.Local).AddTicks(2760));
+                value: new DateTime(2025, 7, 30, 21, 45, 39, 858, DateTimeKind.Local).AddTicks(4584));
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "01961d25-b4da-71e9-a488-1b8db232e984",
                 column: "CreatedAt",
-                value: new DateTime(2025, 7, 27, 23, 50, 5, 609, DateTimeKind.Local).AddTicks(7323));
+                value: new DateTime(2025, 7, 30, 21, 45, 39, 870, DateTimeKind.Local).AddTicks(8450));
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "01961d25-b4da-75a5-a1f4-a7aa10e421ed",
                 column: "CreatedAt",
-                value: new DateTime(2025, 7, 27, 23, 50, 5, 609, DateTimeKind.Local).AddTicks(6979));
+                value: new DateTime(2025, 7, 30, 21, 45, 39, 870, DateTimeKind.Local).AddTicks(8221));
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
                 keyColumn: "Id",
                 keyValue: "0195d439-9ca1-7873-9c14-a4bc1c201593",
                 columns: new[] { "CreatedAt", "PasswordHash" },
-                values: new object[] { new DateTime(2025, 7, 27, 23, 50, 5, 674, DateTimeKind.Local).AddTicks(6057), "AQAAAAIAAYagAAAAEKfw/Lw2qXodiXpM7meqO+x43//u8r2QqMPZV/0AoOH0WbIv/MVSvR46dsvvKSfmYA==" });
+                values: new object[] { new DateTime(2025, 7, 30, 21, 45, 39, 936, DateTimeKind.Local).AddTicks(820), "AQAAAAIAAYagAAAAELNTyhfSZ25ndy1idT5TojBsDgNW74EXdAOo4MMU+6iUQVGouxSG8ydoNJhpWRHuNA==" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderReports_OrderId",
@@ -77,28 +77,28 @@ namespace Shipping.Infrastructure.Migrations
                 keyColumn: "Id",
                 keyValue: "01961d25-b4da-7184-a2a8-765486bd4857",
                 column: "CreatedAt",
-                value: new DateTime(2025, 7, 27, 21, 17, 49, 395, DateTimeKind.Local).AddTicks(2129));
+                value: new DateTime(2025, 7, 29, 17, 38, 46, 487, DateTimeKind.Local).AddTicks(2514));
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "01961d25-b4da-71e9-a488-1b8db232e984",
                 column: "CreatedAt",
-                value: new DateTime(2025, 7, 27, 21, 17, 49, 407, DateTimeKind.Local).AddTicks(4403));
+                value: new DateTime(2025, 7, 29, 17, 38, 46, 499, DateTimeKind.Local).AddTicks(5305));
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "01961d25-b4da-75a5-a1f4-a7aa10e421ed",
                 column: "CreatedAt",
-                value: new DateTime(2025, 7, 27, 21, 17, 49, 407, DateTimeKind.Local).AddTicks(4124));
+                value: new DateTime(2025, 7, 29, 17, 38, 46, 499, DateTimeKind.Local).AddTicks(4987));
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
                 keyColumn: "Id",
                 keyValue: "0195d439-9ca1-7873-9c14-a4bc1c201593",
                 columns: new[] { "CreatedAt", "PasswordHash" },
-                values: new object[] { new DateTime(2025, 7, 27, 21, 17, 49, 471, DateTimeKind.Local).AddTicks(8629), "AQAAAAIAAYagAAAAEDd/7v58/Pv27l5DvvI5krdZuN7OUbl5liki7lV/DFu/EtCm3EE8yuE2uloGVlVesg==" });
+                values: new object[] { new DateTime(2025, 7, 29, 17, 38, 46, 564, DateTimeKind.Local).AddTicks(7036), "AQAAAAIAAYagAAAAEG0Qf+DFnhyNhgclg9skMCw5xzYEUcbCiZLm1p3n5TEPEeSlYcjptR7Fp8XRwYmo9A==" });
         }
     }
 }
