@@ -1,6 +1,7 @@
 ﻿using Shipping.Application.Abstraction.Branch.Service;
 using Shipping.Application.Abstraction.CitySettings.Service;
 using Shipping.Application.Abstraction.CourierReport.Service;
+using Shipping.Application.Abstraction.OrderReport.Service;
 using Shipping.Application.Abstraction.Orders.Service;
 using Shipping.Application.Abstraction.Product.Service;
 using Shipping.Application.Abstraction.ShippingType.Serivce;
@@ -15,6 +16,7 @@ public interface IServiceManager
     public ICourierReportService courierReportService { get; }
     public IShippingTypeService shippingTypeService { get; }
     public IOrderService orderService { get; }
+    public IOrderReportService orderReportService { get; }
     public IBranchService branchService { get; }
     public ISpecialCityCostService specialCityCostService { get; }
     public ICitySettingService citySettingService { get; }

@@ -2,12 +2,14 @@
 using Shipping.Application.Abstraction.Branch.DTO;
 using Shipping.Application.Abstraction.CitySettings.DTO;
 using Shipping.Application.Abstraction.CourierReport.DTOs;
+using Shipping.Application.Abstraction.OrderReport.DTO;
 using Shipping.Application.Abstraction.Orders.DTO;
 using Shipping.Application.Abstraction.Product.DTOs;
 using Shipping.Application.Abstraction.ShippingType.DTOs;
 using Shipping.Application.Abstraction.SpecialCityCost.DTO;
 using Shipping.Application.Abstraction.SpecialCourierRegion.DTO;
 using Shipping.Domain.Entities;
+using Shipping.Domain.Enums;
 
 namespace Shipping.Application.Mapping;
 public class MappingProfile : Profile
@@ -90,6 +92,36 @@ public class MappingProfile : Profile
 
 
 
+        #endregion
+
+        #region  Configration Of OrderReport
+
+        CreateMap<OrderReport, OrderReportDTO>()
+        .ForMember(dest => dest.OrderId, op => op.MapFrom(src => src.OrderId))
+        .ReverseMap();
+
+        CreateMap<OrderReportDTO, OrderReport>()
+        .ForMember(dest => dest.Id, opt => opt.Ignore()) // Ignore Id since it's set from the route
+        .ForMember(dest => dest.ReportDate, opt => opt.MapFrom(src => src.ReportDate))
+        .ForMember(dest => dest.ReportDetails, opt => opt.MapFrom(src => src.ReportDetails))
+        .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.OrderId));
+
+        CreateMap<OrderReport, OrderReportToShowDTO>()
+        .ForMember(dest => dest.Id, op => op.MapFrom(src => src.Id))
+        .ForMember(dest => dest.ReportDate, op => op.MapFrom(src => src.ReportDate))
+        .ForMember(dest => dest.IsDeleted, op => op.MapFrom(src => src.Order != null ? src.Order.IsDeleted : false))
+        .ForMember(dest => dest.MerchantId, op => op.MapFrom(src => src.Order != null ? src.Order.MerchantId : string.Empty))
+        .ForMember(dest => dest.CourierId, op => op.MapFrom(src => src.Order != null ? src.Order.CourierId : string.Empty))
+        .ForMember(dest => dest.CustomerName, op => op.MapFrom(src => src.Order != null ? src.Order.CustomerName : string.Empty))
+        .ForMember(dest => dest.CustomerPhone1, op => op.MapFrom(src => src.Order != null ? src.Order.CustomerPhone : string.Empty))
+        .ForMember(dest => dest.RegionName, op => op.MapFrom(src => src.Order != null && src.Order.Region != null ? src.Order.Region.Governorate : string.Empty))
+        .ForMember(dest => dest.CityName, op => op.MapFrom(src => src.Order != null && src.Order.CitySetting != null ? src.Order.CitySetting.Name : string.Empty))
+        .ForMember(dest => dest.OrderCost, op => op.MapFrom(src => src.Order != null ? src.Order.OrderCost : 0))
+        .ForMember(dest => dest.ShippingCost, op => op.MapFrom(src => src.Order != null ? src.Order.ShippingCost : 0))
+        .ForMember(dest => dest.PaymentType, op => op.MapFrom(src => src.Order != null ? src.Order.PaymentType.ToString() : "No Payment"))
+        .ForMember(dest => dest.OrderStatus,
+    opt => opt.MapFrom(src => src.Order != null ? src.Order.Status : OrderStatus.Pending))
+        .ReverseMap();
         #endregion
 
         #region Configuration Of Branch
