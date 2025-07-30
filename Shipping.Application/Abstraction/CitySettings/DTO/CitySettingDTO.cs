@@ -1,10 +1,7 @@
-﻿using System.Text.Json.Serialization;
-
 namespace Shipping.Application.Abstraction.CitySettings.DTO;
+
 public class CitySettingBaseDTO
 {
-    public int Id { get; set; }
-
     public required string Name { get; set; }
 
     public decimal StandardShippingCost { get; set; }
@@ -18,7 +15,6 @@ public class CitySettingBaseDTO
 
 public class CitySettingDTO : CitySettingBaseDTO
 {
-    [JsonIgnore]
     public int Id { get; set; }
 
     public string? RegionName { get; set; }
@@ -32,7 +28,7 @@ public class CitySettingDTO : CitySettingBaseDTO
 
 public class CitySettingToAddDTO : CitySettingBaseDTO
 {
-    //public int Id { get; set; }
+
 }
 
 public class CitySettingToUpdateDTO : CitySettingBaseDTO

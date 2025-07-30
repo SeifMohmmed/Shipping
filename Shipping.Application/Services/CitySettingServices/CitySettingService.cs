@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Shipping.Application.Abstraction.CitySettings.DTO;
 using Shipping.Application.Abstraction.CitySettings.Service;
 using Shipping.Domain.Entities;
@@ -11,11 +12,32 @@ internal class CitySettingService(IUnitOfWork unitOfWork,
 {
     //GetAll Cities
     public async Task<IEnumerable<CitySettingDTO>> GetAllCitySettingAsync(PaginationParameters pramter)
-    => mapper.Map<IEnumerable<CitySettingDTO>>(await unitOfWork.GetRepository<CitySetting, int>().GetAllAsync(pramter));
+    {
+        var entity = await unitOfWork.GetRepository<CitySetting, int>()
+            .GetAllAsync(pramter,
+            p => p.Include(c => c.Region)
+            .Include(c => c.Users)
+            .Include(c => c.Orders)
+            .Include(c => c.SpecialPickups)
+                .ThenInclude(sp => sp.Merchant)
+            );
 
+        return mapper.Map<IEnumerable<CitySettingDTO>>(entity);
+    }
     //GetById City
     public async Task<CitySettingDTO> GetCitySettingAsync(int id)
-    => mapper.Map<CitySettingDTO>(await unitOfWork.GetRepository<CitySetting, int>().GetByIdAsync(id));
+    {
+        var entity = await unitOfWork.GetRepository<CitySetting, int>()
+            .GetByIdAsync(id,
+            p => p.Include(c => c.Region)
+            .Include(c => c.Users)
+            .Include(c => c.Orders)
+            .Include(c => c.SpecialPickups)
+                .ThenInclude(sp => sp.Merchant)
+            );
+
+        return mapper.Map<CitySettingDTO>(entity);
+    }
 
     //Add City
     public async Task<CitySettingDTO> AddAsync(CitySettingToAddDTO DTO)
@@ -60,10 +82,17 @@ internal class CitySettingService(IUnitOfWork unitOfWork,
     }
 
     // Get city by governorate name
-    public async Task<IEnumerable<CitySettingDTO>> GetCityByGovernorateName(int regionId)
+    public async Task<IEnumerable<CitySettingDTO>> GetCitiesByRegionId(int regionId)
     {
         var regionRepo = unitOfWork.GetRepository<Region, int>();
-        var region = await regionRepo.GetByIdAsync(regionId);
+        var region = await regionRepo.GetByIdAsync(regionId,
+            p => p
+                .Include(c => c.Users)
+                .Include(c => c.Orders)
+                .Include(c => c.SpecialCourierRegion)
+                    .ThenInclude(sp => sp.Courier)
+                .Include(c => c.CitySettings)
+        );
 
         if (region is null)
             throw new KeyNotFoundException($"Region with ID {regionId} not found.");
