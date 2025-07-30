@@ -54,13 +54,14 @@ public class MappingProfile : Profile
             dest.City = src.CitySetting?.Name;
             dest.MerchantName = src.MerchantId;
             dest.Status = src.Status.ToString();
-            dest.CustomerInfo = $"{src.CustomerName} {src.CustomerPhone}";
+            dest.CustomerAddress = $"{src.CustomerName} {src.CustomerPhone}";
             dest.OrderCost = src.OrderCost + src.ShippingCost;
             dest.CourierId = src.CourierId;
 
         }).ReverseMap();
 
         CreateMap<Order, UpdateOrderDTO>().ReverseMap().ForMember(dest => dest.CitySettingId, opt => opt.MapFrom(src => src.City))
+        .ForMember(dest => dest.Id, opt => opt.Ignore()) // Explicitly ignore Id
         .ForMember(dest => dest.BranchId, opt => opt.MapFrom(src => src.Branch))
         .ForMember(dest => dest.RegionId, opt => opt.MapFrom(src => src.Region))
         .ForMember(dest => dest.ShippingTypeId, opt => opt.MapFrom(src => src.ShippingId))
@@ -80,7 +81,15 @@ public class MappingProfile : Profile
          .ForMember(dest => dest.Branch, opt => opt.Ignore())
          .ForMember(dest => dest.Region, opt => opt.Ignore())
          .ForMember(dest => dest.ShippingType, opt => opt.Ignore())
-         .ForMember(dest => dest.CitySetting, opt => opt.Ignore());
+         .ForMember(dest => dest.CitySetting, opt => opt.Ignore())
+         .ForMember(dest => dest.CourierId, opt => opt.MapFrom(src => src.CourierId))
+         .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.CustomerName))
+         .ForMember(dest => dest.CustomerPhone, opt => opt.MapFrom(src => src.CustomerPhone))
+         .ForMember(dest => dest.CustomerEmail, opt => opt.MapFrom(src => src.CustomerEmail))
+         .ForMember(dest => dest.CustomerAddress, opt => opt.MapFrom(src => src.CustomerAddress));
+
+
+
         #endregion
 
         #region Configuration Of Branch
