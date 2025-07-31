@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Shipping.Application.Abstraction.SpecialCityCost.DTO;
 using Shipping.Application.Abstraction.SpecialCityCost.Service;
 using Shipping.Domain.Entities;
@@ -12,26 +13,36 @@ internal class SpecialCityCostService(IUnitOfWork unitOfWork,
 
     //GetAll SpecialCityCost
     public async Task<IEnumerable<SpecialCityCostDTO>> GetAllSpecialCityCostAsync(PaginationParameters pramter)
-     => mapper.Map<IEnumerable<SpecialCityCostDTO>>(await unitOfWork.GetRepository<SpecialCityCost, int>().GetAllAsync(pramter));
+    {
+        var specialCityCosts = await unitOfWork.GetRepository<SpecialCityCost, int>().GetAllAsync(pramter,
+            include: p => p
+            .Include(c => c.CitySetting)
+            .Include(c => c.Merchant));
 
+        return mapper.Map<IEnumerable<SpecialCityCostDTO>>(specialCityCosts);
+    }
 
     //GetById SpecialCityCost
     public async Task<SpecialCityCostDTO> GetSpecialCityCostAsync(int id)
-    => mapper.Map<SpecialCityCostDTO>(await unitOfWork.GetRepository<SpecialCityCost, int>().GetByIdAsync(id));
+    {
+        var specialCityCost = await unitOfWork.GetRepository<SpecialCityCost, int>().GetByIdAsync(id, include:
+            p => p
+            .Include(c => c.CitySetting)
+            .Include(c => c.Merchant));
 
+        return mapper.Map<SpecialCityCostDTO>(specialCityCost);
+    }
 
     //Add SpecialCityCost
-    public async Task AddAsync(SpecialCityCostDTO DTO)
+    public async Task<SpecialCityAddDTO> AddAsync(SpecialCityAddDTO DTO)
     {
-        var cityCost =
-            await unitOfWork.GetRepository<SpecialCityCost, int>().GetByIdAsync(DTO.Id);
+        var specialCityCost = mapper.Map<SpecialCityCost>(DTO);
 
-        if (cityCost is null)
-            throw new KeyNotFoundException($"SpecialCityCost with ID {DTO.CitySettingId} does not exist.");
-
-        await unitOfWork.GetRepository<SpecialCityCost, int>().AddAsync(mapper.Map<SpecialCityCost>(DTO));
+        await unitOfWork.GetRepository<SpecialCityCost, int>().AddAsync(specialCityCost);
 
         await unitOfWork.CompleteAsync();
+
+        return mapper.Map<SpecialCityAddDTO>(specialCityCost);
     }
 
 
@@ -52,20 +63,21 @@ internal class SpecialCityCostService(IUnitOfWork unitOfWork,
 
 
     //Update SpecialCityCost
-    public async Task UpdateAsync(SpecialCityCostDTO DTO)
+    public async Task UpdateAsync(int id, SpecialCityUpdateDTO DTO)
     {
         var specialCityRepo = unitOfWork.GetRepository<SpecialCityCost, int>();
 
-        var existingSpecialCityCost = await specialCityRepo.GetByIdAsync(DTO.Id);
+        var existingSpecialCityCost = await specialCityRepo.GetByIdAsync(id);
 
         if (existingSpecialCityCost is null)
-            throw new KeyNotFoundException($"SpecialCityCost with ID {DTO.Id} does not exist.");
+            throw new KeyNotFoundException($"SpecialCityCost with ID {id} does not exist.");
 
         mapper.Map(DTO, existingSpecialCityCost);
 
         specialCityRepo.UpdateAsync(existingSpecialCityCost);
 
         await unitOfWork.CompleteAsync();
+
     }
 
 

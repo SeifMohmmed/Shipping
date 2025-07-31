@@ -146,11 +146,25 @@ public class MappingProfile : Profile
 
         #region Configuration Of SpecialCityCost
         CreateMap<SpecialCityCost, SpecialCityCostDTO>()
-           .ForMember(dest => dest.MerchantId, op => op.MapFrom(src => src.Merchant != null ? src.Merchant.Id : null))
-           .ForMember(des => des.MerchantName, op => op.MapFrom(src => src.Merchant != null ? src.Merchant.FullName : null))
-           .ForMember(des => des.CitySettingId, op => op.MapFrom(src => src.CitySetting != null ? src.CitySetting.Id : (int?)null))
-           .ForMember(des => des.CitySettingName, op => op.MapFrom(src => src.CitySetting != null ? src.CitySetting.Name : null))
-           .ReverseMap();
+            .ForMember(dest => dest.MerchantId, opt => opt.MapFrom(src => src.Merchant != null ? src.Merchant.Id : null))
+            .ForMember(dest => dest.MerchantName, opt => opt.MapFrom(src => src.Merchant != null ? src.Merchant.FullName : null))
+            .ForMember(dest => dest.CitySettingId, opt => opt.MapFrom(src => src.CitySetting != null ? src.CitySetting.Id : (int?)null))
+            .ForMember(dest => dest.CitySettingName, opt => opt.MapFrom(src => src.CitySetting != null ? src.CitySetting.Name : null))
+            .ReverseMap();
+
+        CreateMap<SpecialCityCost, SpecialCityAddDTO>()
+            .ForMember(dest => dest.MerchantId, op => op.MapFrom(src => src.Merchant != null ? src.Merchant.Id : null))
+            .ForMember(dest => dest.MerchantName, opt => opt.Ignore())
+            .ForMember(dest => dest.CitySettingId, op => op.MapFrom(src => src.CitySetting != null ? src.CitySetting.Id : (int?)null))
+            .ForMember(dest => dest.CitySettingName, opt => opt.Ignore())
+            .ReverseMap();
+
+        CreateMap<SpecialCityUpdateDTO, SpecialCityCost>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore()) // 👈 prevent overwriting the key
+            .ForMember(dest => dest.Merchant, opt => opt.Ignore())
+            .ForMember(dest => dest.CitySetting, opt => opt.Ignore());
+
+
         #endregion
 
         #region Configuration Of CitySetting
