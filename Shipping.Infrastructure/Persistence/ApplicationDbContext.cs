@@ -12,6 +12,7 @@ internal class ApplicationDbContext(DbContextOptions<ApplicationDbContext> optio
     internal DbSet<CitySetting> CitySettings { get; set; }
     internal DbSet<CourierReport> CourierReports { get; set; }
     internal DbSet<Order> Orders { get; set; }
+    internal DbSet<OrderReport> OrderReports { get; set; }
     internal DbSet<Product> Products { get; set; }
     internal DbSet<Region> Regions { get; set; }
     internal DbSet<ShippingType> ShippingTypes { get; set; }

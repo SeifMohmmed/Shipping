@@ -10,11 +10,15 @@ public class ProductService(IUnitOfWork _unitOfWork,
     IMapper _mapper) : IProductService
 {
     // Add Product  
-    public async Task AddAsync(ProductDTO DTO)
+    public async Task<ProductDTO> AddAsync(ProductDTO DTO)
     {
-        await _unitOfWork.GetRepository<Product, int>().AddAsync(_mapper.Map<Product>(DTO));
+        var product = _mapper.Map<Product>(DTO);
+
+        await _unitOfWork.GetRepository<Product, int>().AddAsync(product);
 
         await _unitOfWork.CompleteAsync();
+
+        return _mapper.Map<ProductDTO>(product);
     }
 
     // Delete Product  
@@ -39,22 +43,22 @@ public class ProductService(IUnitOfWork _unitOfWork,
     }
 
     //Get All Products
-    public async Task<IEnumerable<ProductDTO>> GetProductsAsync(Pramter pramter)
+    public async Task<IEnumerable<ProductDTO>> GetProductsAsync(PaginationParameters pramter)
     {
         return
             _mapper.Map<IEnumerable<ProductDTO>>(await _unitOfWork.GetRepository<Product, int>().GetAllAsync(pramter));
     }
 
-    public async Task UpdateAsync(UpdateProductDTO DTO)
+    public async Task UpdateAsync(int id, UpdateProductDTO DTO)
     {
         var productRepo = _unitOfWork.GetRepository<Product, int>();
 
-        var existingProduct = await productRepo.GetByIdAsync(DTO.Id);
+        var existingProduct = await productRepo.GetByIdAsync(id);
 
         if (existingProduct is null)
-            throw new KeyNotFoundException($"Product with ID {DTO.Id} not found.");
+            throw new KeyNotFoundException($"Product with ID {id} not found.");
 
-        _mapper.Map(DTO, existingProduct); // Update existing entity with DTO data
+        _mapper.Map(DTO, existingProduct);
 
         productRepo.UpdateAsync(existingProduct);
 

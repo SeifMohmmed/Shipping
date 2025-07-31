@@ -12,5 +12,6 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped(typeof(IServiceManager), typeof(ServiceManager));
 
+
     }
 }
