@@ -1,12 +1,12 @@
 ﻿using Shipping.Application.Abstraction.Product.DTOs;
-using Shipping.Domain.Pramter_Helper;
+using Shipping.Domain.Helpers;
 
 namespace Shipping.Application.Abstraction.Product.Service;
 public interface IProductService
 {
-    Task<IEnumerable<ProductDTO>> GetProductsAsync(Pramter pramter);
+    Task<IEnumerable<ProductDTO>> GetProductsAsync(PaginationParameters pramter);
     Task<ProductDTO> GetProductAsync(int id);
-    Task AddAsync(ProductDTO DTO);
-    Task UpdateAsync(UpdateProductDTO DTO);
+    Task<ProductDTO> AddAsync(ProductDTO DTO);
+    Task UpdateAsync(int id, UpdateProductDTO DTO);
     Task DeleteAsync(int id);
 }

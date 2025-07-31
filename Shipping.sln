@@ -1,15 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36301.6 d17.14
+VisualStudioVersion = 17.14.36301.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shipping.API", "Shipping.API\Shipping.API.csproj", "{13FDA89B-CE36-4D28-BE9B-145662DC5ACC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shipping.Infrastructure", "Shipping.Infrastructure\Shipping.Infrastructure.csproj", "{7CE3773D-0414-4BB4-AF1F-10818F8A9BA4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shipping.Domain", "Shipping.Domain\Shipping.Domain.csproj", "{18EFDE35-DA83-4D8A-BAC3-331F0D125E80}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shipping.Application", "Shipping.Application\Shipping.Application.csproj", "{9D67DC7A-B2E1-466A-B228-44F009387BCB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shipping.Infrastructure", "Shipping.Infrastructure\Shipping.Infrastructure.csproj", "{0C5C33AB-66CC-E8D1-5B23-8D08878AAF04}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +21,6 @@ Global
 		{13FDA89B-CE36-4D28-BE9B-145662DC5ACC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13FDA89B-CE36-4D28-BE9B-145662DC5ACC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13FDA89B-CE36-4D28-BE9B-145662DC5ACC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7CE3773D-0414-4BB4-AF1F-10818F8A9BA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7CE3773D-0414-4BB4-AF1F-10818F8A9BA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7CE3773D-0414-4BB4-AF1F-10818F8A9BA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7CE3773D-0414-4BB4-AF1F-10818F8A9BA4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{18EFDE35-DA83-4D8A-BAC3-331F0D125E80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{18EFDE35-DA83-4D8A-BAC3-331F0D125E80}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18EFDE35-DA83-4D8A-BAC3-331F0D125E80}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,6 +29,10 @@ Global
 		{9D67DC7A-B2E1-466A-B228-44F009387BCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D67DC7A-B2E1-466A-B228-44F009387BCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9D67DC7A-B2E1-466A-B228-44F009387BCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C5C33AB-66CC-E8D1-5B23-8D08878AAF04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C5C33AB-66CC-E8D1-5B23-8D08878AAF04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C5C33AB-66CC-E8D1-5B23-8D08878AAF04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C5C33AB-66CC-E8D1-5B23-8D08878AAF04}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

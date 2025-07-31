@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Shipping.Application.Abstraction;
 using Shipping.Application.Abstraction.Product.DTOs;
-using Shipping.Domain.Pramter_Helper;
+using Shipping.Domain.Helpers;
 
 namespace Shipping.API.Controllers;
 [Route("api/[controller]")]
@@ -9,13 +9,15 @@ namespace Shipping.API.Controllers;
 public class ProductsController(IServiceManager _serviceManager) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAll([FromQuery] Pramter pramter)
+    public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAll([FromQuery] PaginationParameters pramter)
     {
         var products = await _serviceManager.productService.GetProductsAsync(pramter);
         return Ok(products);
     }
 
     [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProductDTO>> GetById(int id)
     {
         var product = await _serviceManager.productService.GetProductAsync(id);
@@ -27,27 +29,25 @@ public class ProductsController(IServiceManager _serviceManager) : ControllerBas
     }
 
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ProductDTO>> Add(ProductDTO dto)
     {
-        if (dto is null)
-            return BadRequest("Invalid Product data");
+        var product = await _serviceManager.productService.AddAsync(dto);
 
-
-        await _serviceManager.productService.AddAsync(dto);
-
-        return Created();
+        return CreatedAtAction(nameof(GetById), new { id = dto.Id }, dto);
     }
 
     [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ProductDTO>> Update(int id, [FromBody] UpdateProductDTO dto)
     {
-        if (dto is null || id != dto.Id)
-            return BadRequest("Invalid Product data.");
-
         try
         {
-            await _serviceManager.productService.UpdateAsync(dto);
-            return NoContent(); // 204 No Content (successful update)
+            await _serviceManager.productService.UpdateAsync(id, dto);
+            return NoContent();
         }
         catch (KeyNotFoundException ex)
         {
@@ -56,12 +56,14 @@ public class ProductsController(IServiceManager _serviceManager) : ControllerBas
     }
 
     [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> DeleteProduct(int id)
     {
         try
         {
             await _serviceManager.productService.DeleteAsync(id);
-            return NoContent(); // 204 No Content (successful deletion)
+            return NoContent();
         }
 
         catch (KeyNotFoundException ex)

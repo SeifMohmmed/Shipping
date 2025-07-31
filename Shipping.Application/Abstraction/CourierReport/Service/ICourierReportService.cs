@@ -1,9 +1,9 @@
 ﻿using Shipping.Application.Abstraction.CourierReport.DTOs;
-using Shipping.Domain.Pramter_Helper;
+using Shipping.Domain.Helpers;
 
 namespace Shipping.Application.Abstraction.CourierReport.Service;
 public interface ICourierReportService
 {
-    Task<IEnumerable<GetAllCourierOrderCountDTO>> GetAllCourierReportAsync(Pramter pramter);
-    Task<CourierReportDTO> GetCourierReportAsync(int id);
+    Task<IEnumerable<GetAllCourierOrderCountDTO>> GetAllCourierReportAsync(PaginationParameters pramter);
+    Task<CourierReportDTO> GetCourierReportAsync(int id, PaginationParameters parameter);
 }

@@ -12,6 +12,9 @@ public class Region
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
+    //------------- ICollection From User ------------------------------
+    public virtual ICollection<ApplicationUser> Users { get; set; } = [];
+
     //------------- ICollection From CitySetting ------------------------------
     public virtual ICollection<CitySetting> CitySettings { get; set; } = [];
 

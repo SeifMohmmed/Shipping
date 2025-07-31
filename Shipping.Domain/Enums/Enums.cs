@@ -26,3 +26,9 @@ public enum PaymentType
     Prepaid,
     Expulsion
 }
+
+public enum DeductionTypes
+{
+    percentage,
+    Fixed
+}

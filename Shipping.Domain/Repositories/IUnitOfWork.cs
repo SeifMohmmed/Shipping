@@ -6,6 +6,15 @@ public interface IUnitOfWork : IAsyncDisposable
     // This Is A Method That Get The Generic Repository And All Repositories
     IGenericRepository<T, Tkey> GetRepository<T, Tkey>()
         where T : class where Tkey : IEquatable<Tkey>;
+    IWeightSettingRepository GetWeightSettingRepository();
+
+    ISpecialCityCostRepository GetSpecialCityCostRepository();
+
+    IOrderRepository GetOrderRepository();
+
+    IOrderReportRepository GetOrderReportRepository();
+
+    ICityRepository GetCityRepository();
 
     Task<int> CompleteAsync();
 
