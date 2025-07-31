@@ -1,15 +1,20 @@
-﻿namespace Shipping.Application.Abstraction.Product.DTOs;
-public class ProductDTO
-{
-    public string Name { get; set; }
-    public decimal Weight { get; set; }
-    public int Quantity { get; set; }
+﻿using System.Text.Json.Serialization;
 
-}
-public class UpdateProductDTO
+namespace Shipping.Application.Abstraction.Product.DTOs;
+public class BaseProductDTO
 {
-    public int Id { get; set; }
     public string Name { get; set; }
     public decimal Weight { get; set; }
     public int Quantity { get; set; }
+}
+
+public class ProductDTO : BaseProductDTO
+{
+    [JsonIgnore]
+    public int Id { get; set; }
+    public int OrderId { get; set; }
+}
+public class UpdateProductDTO : BaseProductDTO
+{
+
 }
