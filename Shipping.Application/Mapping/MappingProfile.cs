@@ -44,8 +44,16 @@ public class MappingProfile : Profile
 
         #region Configuration of Shipping Type
         CreateMap<ShippingType, ShippingTypeDTO>()
-       .ForMember(des => des.OrdersIds, opt => opt.MapFrom(src => src.Orders.Select(x => x.Id).ToList()))
+        .ForMember(dest => dest.OrdersIds, opt => opt.MapFrom(src => src.Orders.Select(x => x.Id).ToList()))
        .ReverseMap();
+
+        CreateMap<ShippingType, ShippingTypeUpdateDTO>()
+        .ForMember(des => des.OrdersIds, opt => opt.MapFrom(src => src.Orders.Select(x => x.Id).ToList()))
+        .ReverseMap();
+
+        CreateMap<ShippingType, ShippingTypeAddDTO>()
+        .ForMember(des => des.OrdersIds, opt => opt.MapFrom(src => src.Orders.Select(x => x.Id).ToList()))
+        .ReverseMap();
         #endregion
 
         #region Configuration Of Order
