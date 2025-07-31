@@ -18,34 +18,38 @@ public class SpecialCityCostController(IServiceManager serviceManager) : Control
     }
 
     [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<SpecialCityCostDTO>> GetById(int id)
     {
         var speicalCity = await serviceManager.specialCityCostService.GetSpecialCityCostAsync(id);
+
+        if (speicalCity is null)
+            return NotFound($"SpeicalCity with id {id} was not found.");
 
         return Ok(speicalCity);
     }
 
 
     [HttpPost]
-    public async Task<ActionResult<SpecialCityCost>> Add(SpecialCityCostDTO DTO)
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<SpecialCityAddDTO>> Add(SpecialCityAddDTO DTO)
     {
-        if (DTO is null)
-            return BadRequest("Invalid SpecialCityCost data");
-
         await serviceManager.specialCityCostService.AddAsync(DTO);
 
         return CreatedAtAction(nameof(GetById), new { id = DTO.Id }, DTO);
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<SpecialCityCost>> Update(int id, SpecialCityCostDTO DTO)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<SpecialCityCost>> Update(int id, SpecialCityUpdateDTO DTO)
     {
-        if (DTO is null || id != DTO.Id)
-            return BadRequest("Invalid SpecialCityCost data.");
-
         try
         {
-            await serviceManager.specialCityCostService.UpdateAsync(DTO);
+            await serviceManager.specialCityCostService.UpdateAsync(id, DTO);
 
             return NoContent();
         }
@@ -57,6 +61,8 @@ public class SpecialCityCostController(IServiceManager serviceManager) : Control
     }
 
     [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<SpecialCityCost>> Delete(int id)
     {
         try

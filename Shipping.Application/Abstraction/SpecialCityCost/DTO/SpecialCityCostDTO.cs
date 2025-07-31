@@ -1,9 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 
 namespace Shipping.Application.Abstraction.SpecialCityCost.DTO;
+
 public class SpecialCityCostDTO
 {
-    [JsonIgnore]
     public int Id { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
@@ -20,4 +20,16 @@ public class SpecialCityCostDTO
 
     public string CitySettingName { get; set; } = string.Empty;
 
+}
+
+public class SpecialCityAddDTO : SpecialCityCostDTO
+{
+    [JsonIgnore]
+    public int Id { get; set; }
+}
+
+public class SpecialCityUpdateDTO : SpecialCityCostDTO
+{
+    [JsonIgnore]
+    public int Id { get; set; }
 }
