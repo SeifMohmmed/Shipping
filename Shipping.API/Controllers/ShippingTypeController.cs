@@ -18,15 +18,23 @@ public class ShippingTypeController(IServiceManager _serviceManager) : Controlle
     }
 
     [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<ShippingTypeDTO>> Get(int id)
     {
         var shippingtype = await _serviceManager.shippingTypeService.GetShippingTypeAsync(id);
+
+        if (shippingtype is null)
+            return NotFound($"Shipping Type with id {id} was not found.");
+
 
         return Ok(shippingtype);
     }
 
     [HttpPost]
-    public async Task<ActionResult<ShippingTypeDTO>> Add(ShippingTypeDTO dto)
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ShippingTypeDTO>> Add(ShippingTypeAddDTO dto)
     {
         if (dto is null)
             return BadRequest("Invalid ShippingType data");
@@ -37,13 +45,14 @@ public class ShippingTypeController(IServiceManager _serviceManager) : Controlle
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<ShippingTypeDTO>> Update(int id, [FromBody] ShippingTypeDTO dto)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ShippingTypeDTO>> Update(int id, [FromBody] ShippingTypeUpdateDTO dto)
     {
-        if (dto is null || id != dto.Id)
-            return BadRequest("Invalid ShippingType data");
         try
         {
-            await _serviceManager.shippingTypeService.UpdateAsync(dto);
+            await _serviceManager.shippingTypeService.UpdateAsync(id, dto);
             return NoContent();
         }
         catch (KeyNotFoundException ex)
@@ -53,6 +62,8 @@ public class ShippingTypeController(IServiceManager _serviceManager) : Controlle
     }
 
     [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Delete(int id)
     {
         try
