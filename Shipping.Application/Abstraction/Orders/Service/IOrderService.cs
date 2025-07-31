@@ -13,7 +13,7 @@ public interface IOrderService
     Task ChangeOrderStatusToPending(int id);
     Task ChangeOrderStatusToDeclined(int id);
     Task AssignOrderToCourier(int OrderId, string courierId);
-    Task AddAsync(AddOrderDTO DTO);
-    Task UpdateAsync(UpdateOrderDTO DTO);
+    Task<OrderWithProductsDTO> AddAsync(AddOrderDTO DTO);
+    Task UpdateAsync(int id, UpdateOrderDTO DTO);
     Task DeleteAsync(int id);
 }

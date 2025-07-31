@@ -12,8 +12,8 @@ using Shipping.Infrastructure.Persistence;
 namespace Shipping.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250727205007_addOrderReportTable")]
-    partial class addOrderReportTable
+    [Migration("20250730184541_AddOrderReportTableToDb")]
+    partial class AddOrderReportTableToDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -569,7 +569,7 @@ namespace Shipping.Infrastructure.Migrations
                         {
                             Id = "01961d25-b4da-7184-a2a8-765486bd4857",
                             ConcurrencyStamp = "EAE00686-2608-4516-AD1B-F96CD87C475E",
-                            CreatedAt = new DateTime(2025, 7, 27, 23, 50, 5, 597, DateTimeKind.Local).AddTicks(2760),
+                            CreatedAt = new DateTime(2025, 7, 30, 21, 45, 39, 858, DateTimeKind.Local).AddTicks(4584),
                             IsDeleted = false,
                             Name = "Admin",
                             NormalizedName = "ADMIN"
@@ -578,7 +578,7 @@ namespace Shipping.Infrastructure.Migrations
                         {
                             Id = "01961d25-b4da-75a5-a1f4-a7aa10e421ed",
                             ConcurrencyStamp = "386C6E14-D0FD-40FF-80D0-74B419360EF0",
-                            CreatedAt = new DateTime(2025, 7, 27, 23, 50, 5, 609, DateTimeKind.Local).AddTicks(6979),
+                            CreatedAt = new DateTime(2025, 7, 30, 21, 45, 39, 870, DateTimeKind.Local).AddTicks(8221),
                             IsDeleted = false,
                             Name = "Courier",
                             NormalizedName = "COURIER"
@@ -587,7 +587,7 @@ namespace Shipping.Infrastructure.Migrations
                         {
                             Id = "01961d25-b4da-71e9-a488-1b8db232e984",
                             ConcurrencyStamp = "1420D50C-F54D-4503-88E8-A2EFA3BD7137",
-                            CreatedAt = new DateTime(2025, 7, 27, 23, 50, 5, 609, DateTimeKind.Local).AddTicks(7323),
+                            CreatedAt = new DateTime(2025, 7, 30, 21, 45, 39, 870, DateTimeKind.Local).AddTicks(8450),
                             IsDeleted = false,
                             Name = "Merchant",
                             NormalizedName = "MERCHANT"
@@ -611,6 +611,9 @@ namespace Shipping.Infrastructure.Migrations
                     b.Property<decimal?>("CanceledOrder")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("CitySettingId")
+                        .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -687,6 +690,8 @@ namespace Shipping.Infrastructure.Migrations
 
                     b.HasIndex("BranchId");
 
+                    b.HasIndex("CitySettingId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -705,7 +710,7 @@ namespace Shipping.Infrastructure.Migrations
                             Id = "0195d439-9ca1-7873-9c14-a4bc1c201593",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "0195d43b-a808-757b-9c3e-bf90c6091133",
-                            CreatedAt = new DateTime(2025, 7, 27, 23, 50, 5, 674, DateTimeKind.Local).AddTicks(6057),
+                            CreatedAt = new DateTime(2025, 7, 30, 21, 45, 39, 936, DateTimeKind.Local).AddTicks(820),
                             Email = "Seif123@gmail.com",
                             EmailConfirmed = false,
                             FullName = "Seif Admin",
@@ -713,7 +718,7 @@ namespace Shipping.Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "SEIF123@GMAIL.COM",
                             NormalizedUserName = "SEIF123@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKfw/Lw2qXodiXpM7meqO+x43//u8r2QqMPZV/0AoOH0WbIv/MVSvR46dsvvKSfmYA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELNTyhfSZ25ndy1idT5TojBsDgNW74EXdAOo4MMU+6iUQVGouxSG8ydoNJhpWRHuNA==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "0195d43be3f271878cc37be7dfc34361",
                             TwoFactorEnabled = false,
@@ -1161,8 +1166,12 @@ namespace Shipping.Infrastructure.Migrations
             modelBuilder.Entity("Shipping.Domain.Entities.ApplicationUser", b =>
                 {
                     b.HasOne("Shipping.Domain.Entities.Branch", "Branch")
-                        .WithMany()
+                        .WithMany("Users")
                         .HasForeignKey("BranchId");
+
+                    b.HasOne("Shipping.Domain.Entities.CitySetting", null)
+                        .WithMany("Users")
+                        .HasForeignKey("CitySettingId");
 
                     b.HasOne("Shipping.Domain.Entities.Region", "Region")
                         .WithMany("Users")
@@ -1175,11 +1184,11 @@ namespace Shipping.Infrastructure.Migrations
 
             modelBuilder.Entity("Shipping.Domain.Entities.Branch", b =>
                 {
-                    b.HasOne("Shipping.Domain.Entities.Region", "Regions")
+                    b.HasOne("Shipping.Domain.Entities.Region", "Region")
                         .WithMany("Branches")
                         .HasForeignKey("RegionId");
 
-                    b.Navigation("Regions");
+                    b.Navigation("Region");
                 });
 
             modelBuilder.Entity("Shipping.Domain.Entities.CitySetting", b =>
@@ -1320,11 +1329,18 @@ namespace Shipping.Infrastructure.Migrations
                     b.Navigation("SpecialPickups");
                 });
 
+            modelBuilder.Entity("Shipping.Domain.Entities.Branch", b =>
+                {
+                    b.Navigation("Users");
+                });
+
             modelBuilder.Entity("Shipping.Domain.Entities.CitySetting", b =>
                 {
                     b.Navigation("Orders");
 
                     b.Navigation("SpecialPickups");
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Shipping.Domain.Entities.Order", b =>

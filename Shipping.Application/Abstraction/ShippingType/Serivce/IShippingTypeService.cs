@@ -6,7 +6,7 @@ public interface IShippingTypeService
 {
     Task<IEnumerable<ShippingTypeDTO>> GetAllShippingTypeAsync(PaginationParameters pramter);
     Task<ShippingTypeDTO> GetShippingTypeAsync(int id);
-    Task AddAsync(ShippingTypeDTO DTO);
-    Task UpdateAsync(ShippingTypeDTO DTO);
+    Task AddAsync(ShippingTypeAddDTO DTO);
+    Task UpdateAsync(int id, ShippingTypeUpdateDTO DTO);
     Task DeleteAsync(int id);
 }

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Shipping.Application.Abstraction.OrderReport.DTO;
 using Shipping.Application.Abstraction.Orders.DTO;
 using Shipping.Application.Abstraction.Orders.Service;
 using Shipping.Domain.Entities;
@@ -14,25 +16,15 @@ public class OrderService(IUnitOfWork _unitOfWork,
     UserManager<ApplicationUser> _userManager,
     IHttpContextAccessor _httpContextAccessor) : IOrderService
 {
-    // Method to get the merchant name for each order
-    private async Task<IEnumerable<OrderWithProductsDTO>> GetMerchantName(IEnumerable<Order> orders)
-    {
-        var ordersDTO = _mapper.Map<IEnumerable<OrderWithProductsDTO>>(orders);
-        foreach (var order in ordersDTO)
-        {
-            var MerchantName = await _userManager.FindByIdAsync(order.MerchantName);
-            order.MerchantName = MerchantName?.FullName ?? "اسم التاجر غير متاح";
-        }
-        return ordersDTO;
-    }
-    //--------------------------------------------------------------------------
-
-
     // Get all orders
     public async Task<IEnumerable<OrderWithProductsDTO>> GetOrdersAsync(PaginationParameters pramter)
     {
         var orders =
-            await _unitOfWork.GetOrderRepository().GetAllAsync(pramter);
+            await _unitOfWork.GetOrderRepository().GetAllAsync(pramter, p => p
+            .Include(o => o.Branch)
+            .Include(o => o.Region)
+            .Include(o => o.CitySetting)
+            .Include(o => o.Products));
 
         var ordersDTO = await GetMerchantName(orders);
 
@@ -43,10 +35,16 @@ public class OrderService(IUnitOfWork _unitOfWork,
     // Get order by id
     public async Task<OrderWithProductsDTO> GetOrderAsync(int id)
     {
-        var findOrder = await _unitOfWork.GetOrderRepository().GetByIdAsync(id);
+        var findOrder = await _unitOfWork.GetOrderRepository().GetByIdAsync(id,
+            include: p => p
+            .Include(o => o.Branch)
+            .Include(o => o.Region)
+            .Include(o => o.CitySetting)
+            .Include(o => o.Products));
 
         if (findOrder is null || findOrder.IsDeleted)
             return null;
+
         var orderDTO = _mapper.Map<OrderWithProductsDTO>(findOrder);
 
         var merchantName = await _userManager.FindByIdAsync(orderDTO.MerchantName);
@@ -79,69 +77,10 @@ public class OrderService(IUnitOfWork _unitOfWork,
 
 
     // Add new order And Calculate Shipping Cost And Create Order Report
-    public async Task AddAsync(AddOrderDTO DTO)
+    public async Task<OrderWithProductsDTO> AddAsync(AddOrderDTO DTO)
     {
-        decimal shippingCost = 0;
-        decimal orderCost = DTO.OrderCost;
-        decimal totalWeight = DTO.TotalWeight;
+        DTO.ShippingCost = await CalculateShippingCost(DTO);
 
-        var IsOutOfCityShipping = DTO.IsOutOfCityShipping;
-
-        var city = await _unitOfWork.GetRepository<CitySetting, int>().GetByIdAsync(DTO.Id);
-        var pickUpShippingCost = city!.PickUpShippingCost;
-
-        decimal standardShippingCost = city!.StandardShippingCost;
-
-        var AllweightSetting = await _unitOfWork.GetWeightSettingRepository().GetAllWeightSetting();
-        var weightSetting = AllweightSetting.FirstOrDefault();
-        decimal maxWeight = weightSetting!.MaxWeight;
-        decimal costPerKG = weightSetting!.CostPerKg;
-
-
-        var SpecialCityCost = await _unitOfWork.GetSpecialCityCostRepository()
-            .GetCityCostByMarchantId(DTO.MerchantName, DTO.City);
-
-        if (SpecialCityCost is not null)
-        {
-            if (totalWeight > 0 && totalWeight <= maxWeight)
-            {
-                if (IsOutOfCityShipping == true)
-                    shippingCost += SpecialCityCost.Price * 1.1m;
-                shippingCost += SpecialCityCost.Price;
-            }
-            else if (totalWeight > maxWeight)
-            {
-                decimal ExcessWeight = totalWeight - maxWeight;
-                if (IsOutOfCityShipping == true)
-                    shippingCost += SpecialCityCost.Price * 1.1m + (ExcessWeight * costPerKG);
-                shippingCost += SpecialCityCost.Price + (ExcessWeight * costPerKG);
-            }
-        }
-        else
-        {
-            if (totalWeight > 0 && totalWeight <= maxWeight)
-            {
-                if (IsOutOfCityShipping)
-                    shippingCost += standardShippingCost * 1.1m;
-                shippingCost += standardShippingCost;
-            }
-            else if (totalWeight > maxWeight)
-            {
-                decimal ExcessWeight = totalWeight - maxWeight;
-                if (IsOutOfCityShipping)
-                    shippingCost += standardShippingCost * 1.1m + (ExcessWeight * costPerKG);
-                shippingCost += standardShippingCost + (ExcessWeight * costPerKG);
-            }
-        }
-
-        var ShippingType = await _unitOfWork.GetRepository<ShippingType, int>().GetByIdAsync(DTO.ShippingId);
-
-        if (ShippingType is not null)
-        {
-            shippingCost += ShippingType.BaseCost;
-        }
-
-        DTO.ShippingCost = shippingCost;
         var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext!.User);
 
         if (currentUser is not null && await _userManager.IsInRoleAsync(currentUser, DefaultRole.Merchant))
@@ -159,37 +98,47 @@ public class OrderService(IUnitOfWork _unitOfWork,
 
         var orderEntity = _mapper.Map<Order>(DTO);
         await _unitOfWork.GetOrderRepository().AddAsync(orderEntity);
-        await _unitOfWork.CompleteAsync();
+        await _unitOfWork.CompleteAsync(); // Save the Order to get its Id
 
-        #region TODO : Adding Order Report
-        // Retrieve the saved order to get the correct ID
-        //var savedOrder = await _unitOfWork.GetOrderRepository().GetByIdAsync(orderEntity.Id);
 
-        // Create the order report When Add New order
-        //var orderReportDto = new OrderReportDTO
-        //{
-        //    OrderId = savedOrder.Id,
-        //    ReportDate = DateTime.UtcNow
-        //};
+        //Create the order report When Add New order
+        var orderReportDto = new OrderReportDTO
+        {
+            OrderId = orderEntity.Id,
+            ReportDate = DateTime.UtcNow,
+            //ReportDetails = $"New order (ID: {orderEntity.Id}) was created by merchant '{currentUser.UserName}' for customer '{DTO.CustomerName}' with status '{DTO.status}' on {DateTime.UtcNow:yyyy-MM-dd HH:mm} UTC."
+        };
 
-        //await _unitOfWork.GetOrderReportRepository().AddAsync(_mapper.Map<OrderReport>(orderReportDto));
-        //await _unitOfWork.CompleteAsync();
-        #endregion
+        await _unitOfWork.GetOrderReportRepository().AddAsync(_mapper.Map<OrderReport>(orderReportDto));
+        await _unitOfWork.CompleteAsync(); // Save the OrderReport
+
+        return _mapper.Map<OrderWithProductsDTO>(orderEntity);
 
     }
 
 
     //Update Order
-    public async Task UpdateAsync(UpdateOrderDTO DTO)
+    public async Task UpdateAsync(int id, UpdateOrderDTO DTO)
     {
+        if (DTO.Id != 0 && DTO.Id != id)
+        {
+            throw new ArgumentException("The Id in the DTO does not match the provided Id.");
+        }
+
         var orderRepo = _unitOfWork.GetOrderRepository();
 
-        var existingOrder = await orderRepo.GetByIdAsync(DTO.Id);
+        var existingOrder = await orderRepo.GetByIdAsync(id,
+            include: p => p
+            .Include(o => o.Branch)
+            .Include(o => o.Region)
+            .Include(o => o.CitySetting)
+            .Include(o => o.Products));
 
         if (existingOrder is null)
-            throw new KeyNotFoundException($"Order with ID {DTO.Id} not found.");
+            throw new KeyNotFoundException($"Order with ID {id} not found.");
 
         _mapper.Map(DTO, existingOrder);
+
 
         orderRepo.UpdateAsync(existingOrder);
         await _unitOfWork.CompleteAsync();
@@ -262,5 +211,59 @@ public class OrderService(IUnitOfWork _unitOfWork,
         await ChangeOrderStatus(id, OrderStatus.Pending);
     }
 
+    //=============================================================================================================
+    // Method to get the merchant name for each order
+    private async Task<IEnumerable<OrderWithProductsDTO>> GetMerchantName(IEnumerable<Order> orders)
+    {
+        var ordersDTO = _mapper.Map<IEnumerable<OrderWithProductsDTO>>(orders);
+        foreach (var order in ordersDTO)
+        {
+            var MerchantName = await _userManager.FindByIdAsync(order.MerchantName);
+            order.MerchantName = MerchantName?.FullName ?? "اسم التاجر غير متاح";
+        }
+        return ordersDTO;
+    }
 
+    //Method To Calculate Shipping Cost
+    private async Task<decimal> CalculateShippingCost(AddOrderDTO DTO)
+    {
+        decimal shippingCost = 0;
+        decimal totalWeight = DTO.TotalWeight;
+        bool isOutOfCity = DTO.IsOutOfCityShipping;
+
+        var city = await _unitOfWork.GetRepository<CitySetting, int>().GetByIdAsync(DTO.City)
+            ?? throw new KeyNotFoundException($"City with ID {DTO.City} not found.");
+
+        var weightSetting = (await _unitOfWork.GetWeightSettingRepository().GetAllWeightSetting()).FirstOrDefault()
+            ?? throw new Exception("Weight settings not configured.");
+
+        decimal maxWeight = weightSetting.MaxWeight;
+        decimal costPerKg = weightSetting.CostPerKg;
+
+        var specialCityCost = await _unitOfWork.GetSpecialCityCostRepository()
+            .GetCityCostByMarchantId(DTO.MerchantName, DTO.City);
+
+        decimal baseCost = specialCityCost?.Price ?? city.StandardShippingCost;
+
+        if (totalWeight <= maxWeight)
+        {
+            shippingCost += baseCost;
+            if (isOutOfCity)
+                shippingCost += baseCost * 0.1m; // 10% out-of-city fee
+        }
+        else
+        {
+            decimal excessWeight = totalWeight - maxWeight;
+            shippingCost += baseCost + (excessWeight * costPerKg);
+            if (isOutOfCity)
+                shippingCost += baseCost * 0.1m;
+        }
+
+        var shippingType = await _unitOfWork.GetRepository<ShippingType, int>().GetByIdAsync(DTO.ShippingId)
+            ?? throw new KeyNotFoundException($"ShippingType with ID {DTO.ShippingId} not found.");
+
+        shippingCost += shippingType.BaseCost;
+
+        return shippingCost;
+    }
 }

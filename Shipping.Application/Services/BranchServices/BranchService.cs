@@ -30,20 +30,26 @@ public class BranchService(IUnitOfWork unitOfWork,
 
     public async Task DeleteAsync(int id)
     {
-        await unitOfWork.GetRepository<Branch, int>().DeleteAsync(id);
+        var branchRepo = unitOfWork.GetRepository<Branch, int>();
+        var existingBranch = await branchRepo.GetByIdAsync(id);
+
+        if (existingBranch is null)
+            throw new KeyNotFoundException($"Branch with ID {id} not found.");
+
+        await branchRepo.DeleteAsync(id);
 
         await unitOfWork.CompleteAsync();
     }
 
 
-    public async Task UpdateAsync(BranchToUpdateDTO DTO)
+    public async Task UpdateAsync(int id, BranchToUpdateDTO DTO)
     {
         var branchRepo = unitOfWork.GetRepository<Branch, int>();
 
-        var existingBranch = await branchRepo.GetByIdAsync(DTO.Id);
+        var existingBranch = await branchRepo.GetByIdAsync(id);
 
         if (existingBranch is null)
-            throw new KeyNotFoundException($"Branch with ID {DTO.Id} not found.");
+            throw new KeyNotFoundException($"Branch with ID {id} not found.");
 
         mapper.Map(DTO, existingBranch);
 

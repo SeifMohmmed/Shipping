@@ -3,17 +3,23 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Shipping.Application.Abstraction;
 using Shipping.Application.Abstraction.Branch.Service;
+using Shipping.Application.Abstraction.CitySettings.Service;
 using Shipping.Application.Abstraction.CourierReport.Service;
+using Shipping.Application.Abstraction.OrderReport.Service;
 using Shipping.Application.Abstraction.Orders.Service;
 using Shipping.Application.Abstraction.Product.Service;
 using Shipping.Application.Abstraction.ShippingType.Serivce;
 using Shipping.Application.Abstraction.SpecialCityCost.Service;
+using Shipping.Application.Abstraction.SpecialCourierRegion.Serivce;
 using Shipping.Application.Services.BranchServices;
+using Shipping.Application.Services.CitySettingServices;
 using Shipping.Application.Services.CourierReportServices;
+using Shipping.Application.Services.OrderReportServices;
 using Shipping.Application.Services.OrderSerivces;
 using Shipping.Application.Services.ProductServices;
 using Shipping.Application.Services.ShippingTypeServices;
 using Shipping.Application.Services.SpecialCityCostServices;
+using Shipping.Application.Services.SpecialCourierRegionServices;
 using Shipping.Domain.Entities;
 using Shipping.Domain.Repositories;
 
@@ -35,6 +41,9 @@ public class ServiceManager : IServiceManager
     private readonly Lazy<IOrderService> _orderService;
     private readonly Lazy<IBranchService> _branchService;
     private readonly Lazy<ISpecialCityCostService> _specialCityCostService;
+    private readonly Lazy<ICitySettingService> _citySettingService;
+    private readonly Lazy<ISpecialCourierRegionService> _specialCourierRegionService;
+    private readonly Lazy<IOrderReportService> _orderReportService;
 
     public ServiceManager(IUnitOfWork unitOfWork, IMapper mapper, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
     {
@@ -44,6 +53,9 @@ public class ServiceManager : IServiceManager
         _orderService = new Lazy<IOrderService>(() => new OrderService(unitOfWork, mapper, userManager, httpContextAccessor));
         _branchService = new Lazy<IBranchService>(() => new BranchService(unitOfWork, mapper));
         _specialCityCostService = new Lazy<ISpecialCityCostService>(() => new SpecialCityCostService(unitOfWork, mapper));
+        _citySettingService = new Lazy<ICitySettingService>(() => new CitySettingService(unitOfWork, mapper));
+        _specialCourierRegionService = new Lazy<ISpecialCourierRegionService>(() => new SpecialCourierRegionService(unitOfWork, mapper));
+        _orderReportService = new Lazy<IOrderReportService>(() => new OrderReportService(unitOfWork, mapper, userManager));
     }
 
     // Properties to access the services
@@ -51,6 +63,9 @@ public class ServiceManager : IServiceManager
     public ICourierReportService courierReportService => _courierReportService.Value;
     public IShippingTypeService shippingTypeService => _shippingTypeService.Value;
     public IOrderService orderService => _orderService.Value;
+    public IOrderReportService orderReportService => _orderReportService.Value;
     public IBranchService branchService => _branchService.Value;
     public ISpecialCityCostService specialCityCostService => _specialCityCostService.Value;
+    public ICitySettingService citySettingService => _citySettingService.Value;
+    public ISpecialCourierRegionService specialCourierRegionService => _specialCourierRegionService.Value;
 }

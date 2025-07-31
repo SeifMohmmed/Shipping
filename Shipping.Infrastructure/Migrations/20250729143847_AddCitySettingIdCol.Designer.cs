@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Shipping.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using Shipping.Infrastructure.Persistence;
 namespace Shipping.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250729143847_AddCitySettingIdCol")]
+    partial class AddCitySettingIdCol
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -566,7 +569,7 @@ namespace Shipping.Infrastructure.Migrations
                         {
                             Id = "01961d25-b4da-7184-a2a8-765486bd4857",
                             ConcurrencyStamp = "EAE00686-2608-4516-AD1B-F96CD87C475E",
-                            CreatedAt = new DateTime(2025, 7, 30, 21, 45, 39, 858, DateTimeKind.Local).AddTicks(4584),
+                            CreatedAt = new DateTime(2025, 7, 29, 17, 38, 46, 487, DateTimeKind.Local).AddTicks(2514),
                             IsDeleted = false,
                             Name = "Admin",
                             NormalizedName = "ADMIN"
@@ -575,7 +578,7 @@ namespace Shipping.Infrastructure.Migrations
                         {
                             Id = "01961d25-b4da-75a5-a1f4-a7aa10e421ed",
                             ConcurrencyStamp = "386C6E14-D0FD-40FF-80D0-74B419360EF0",
-                            CreatedAt = new DateTime(2025, 7, 30, 21, 45, 39, 870, DateTimeKind.Local).AddTicks(8221),
+                            CreatedAt = new DateTime(2025, 7, 29, 17, 38, 46, 499, DateTimeKind.Local).AddTicks(4987),
                             IsDeleted = false,
                             Name = "Courier",
                             NormalizedName = "COURIER"
@@ -584,7 +587,7 @@ namespace Shipping.Infrastructure.Migrations
                         {
                             Id = "01961d25-b4da-71e9-a488-1b8db232e984",
                             ConcurrencyStamp = "1420D50C-F54D-4503-88E8-A2EFA3BD7137",
-                            CreatedAt = new DateTime(2025, 7, 30, 21, 45, 39, 870, DateTimeKind.Local).AddTicks(8450),
+                            CreatedAt = new DateTime(2025, 7, 29, 17, 38, 46, 499, DateTimeKind.Local).AddTicks(5305),
                             IsDeleted = false,
                             Name = "Merchant",
                             NormalizedName = "MERCHANT"
@@ -707,7 +710,7 @@ namespace Shipping.Infrastructure.Migrations
                             Id = "0195d439-9ca1-7873-9c14-a4bc1c201593",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "0195d43b-a808-757b-9c3e-bf90c6091133",
-                            CreatedAt = new DateTime(2025, 7, 30, 21, 45, 39, 936, DateTimeKind.Local).AddTicks(820),
+                            CreatedAt = new DateTime(2025, 7, 29, 17, 38, 46, 564, DateTimeKind.Local).AddTicks(7036),
                             Email = "Seif123@gmail.com",
                             EmailConfirmed = false,
                             FullName = "Seif Admin",
@@ -715,7 +718,7 @@ namespace Shipping.Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "SEIF123@GMAIL.COM",
                             NormalizedUserName = "SEIF123@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAELNTyhfSZ25ndy1idT5TojBsDgNW74EXdAOo4MMU+6iUQVGouxSG8ydoNJhpWRHuNA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEG0Qf+DFnhyNhgclg9skMCw5xzYEUcbCiZLm1p3n5TEPEeSlYcjptR7Fp8XRwYmo9A==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "0195d43be3f271878cc37be7dfc34361",
                             TwoFactorEnabled = false,
@@ -913,31 +916,6 @@ namespace Shipping.Infrastructure.Migrations
                     b.HasIndex("ShippingTypeId");
 
                     b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("Shipping.Domain.Entities.OrderReport", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ReportDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ReportDetails")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.ToTable("OrderReports");
                 });
 
             modelBuilder.Entity("Shipping.Domain.Entities.Product", b =>
@@ -1253,17 +1231,6 @@ namespace Shipping.Infrastructure.Migrations
                     b.Navigation("Region");
 
                     b.Navigation("ShippingType");
-                });
-
-            modelBuilder.Entity("Shipping.Domain.Entities.OrderReport", b =>
-                {
-                    b.HasOne("Shipping.Domain.Entities.Order", "Order")
-                        .WithMany()
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("Shipping.Domain.Entities.Product", b =>
