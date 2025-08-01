@@ -47,4 +47,6 @@ public class ApplicationUser : IdentityUser
 
     public virtual ICollection<SpecialCourierRegion> SpecialCourierRegion { get; set; } = [];
 
+    public List<RefreshToken>? RefreshTokens { get; set; }
+
 }
