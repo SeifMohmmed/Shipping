@@ -11,7 +11,5 @@ public static class ServiceCollectionExtensions
         services.AddAutoMapper(applicationAssembly);
 
         services.AddScoped(typeof(IServiceManager), typeof(ServiceManager));
-
-
     }
 }

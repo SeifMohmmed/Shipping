@@ -6,7 +6,8 @@ using Shipping.Domain.Entities;
 using Shipping.Domain.Helpers;
 
 namespace Shipping.Infrastructure.Persistence;
-internal class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser, ApplicationRole, string>(options)
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+    : IdentityDbContext<ApplicationUser, ApplicationRole, string>(options)
 {
     internal DbSet<Branch> Branches { get; set; }
     internal DbSet<CitySetting> CitySettings { get; set; }

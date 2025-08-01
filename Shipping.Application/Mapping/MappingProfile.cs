@@ -8,6 +8,7 @@ using Shipping.Application.Abstraction.Product.DTOs;
 using Shipping.Application.Abstraction.ShippingType.DTOs;
 using Shipping.Application.Abstraction.SpecialCityCost.DTO;
 using Shipping.Application.Abstraction.SpecialCourierRegion.DTO;
+using Shipping.Application.Abstraction.User.DTO;
 using Shipping.Domain.Entities;
 using Shipping.Domain.Enums;
 
@@ -186,6 +187,47 @@ public class MappingProfile : Profile
              .ForMember(dest => dest.CourierId, opt => opt.MapFrom(src => src.Courier != null ? src.Courier.Id : null))
              .ForMember(dest => dest.CourierName, opt => opt.MapFrom(src => src.Courier != null ? src.Courier.FullName : null))
              .ReverseMap();
+        #endregion
+
+        #region Configration Of Application User (Courier , Merchant , Employee)
+        CreateMap<ApplicationUser, CourierDTO>()
+             .ForMember(dest => dest.CourierId, opt => opt.MapFrom(src => src.Id))
+             .ForMember(dest => dest.CourierName, opt => opt.MapFrom(src => src.FullName))
+             .ReverseMap();
+
+        CreateMap<ApplicationUser, EmployeeDTO>()
+             .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch!.Name))
+             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+             .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+             .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+             .ReverseMap();
+
+
+        CreateMap<AddEmployeeDTO, ApplicationUser>().AfterMap((src, dest) =>
+        {
+            dest.UserName = src.Email;
+        });
+
+        CreateMap<AddMerchantDTO, ApplicationUser>().AfterMap((src, dest) =>
+        {
+            dest.UserName = src.Email;
+        });
+
+        CreateMap<AddCourierDTO, ApplicationUser>().AfterMap((src, dest) =>
+        {
+            dest.UserName = src.Email;
+        });
+
+        CreateMap<SpecialCityCostDT0, SpecialCityCost>().ReverseMap();
+        CreateMap<CourierRegionDT0, SpecialCourierRegion>().ReverseMap();
+        CreateMap<SpecialCourierRegionDTO, SpecialCourierRegion>().ReverseMap();
+        CreateMap<ApplicationUser, MerchantDTO>()
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.FullName))
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.PhoneNumber))
+            .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+            .ReverseMap();
         #endregion
     }
 

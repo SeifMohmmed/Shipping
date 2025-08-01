@@ -8,6 +8,9 @@ public interface IUnitOfWork : IAsyncDisposable
         where T : class where Tkey : IEquatable<Tkey>;
     IWeightSettingRepository GetWeightSettingRepository();
 
+    ISpecialCourierRegionRepository GetSpecialCourierRegionRepository();
+
+
     ISpecialCityCostRepository GetSpecialCityCostRepository();
 
     IOrderRepository GetOrderRepository();

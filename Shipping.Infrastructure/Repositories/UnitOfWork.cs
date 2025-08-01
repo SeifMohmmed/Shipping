@@ -44,4 +44,9 @@ internal class UnitOfWork(ApplicationDbContext _context) : IUnitOfWork
     {
         return (IOrderReportRepository)_repositories.GetOrAdd(typeof(OrderReport).Name, new OrderReportRepository(_context));
     }
+
+    public ISpecialCourierRegionRepository GetSpecialCourierRegionRepository()
+    {
+        return (ISpecialCourierRegionRepository)_repositories.GetOrAdd(typeof(SpecialCourierRegion).Name, new SpecialCourierRegionRepository(_context));
+    }
 }
