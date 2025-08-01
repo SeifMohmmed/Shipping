@@ -29,7 +29,7 @@ public class CitySettingController(IServiceManager serviceManager) : ControllerB
         return Ok(citySettings);
     }
 
-    [HttpGet("CityByRegion/{regionId}")]
+    [HttpGet("Region/{regionId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<CitySettingDTO>>> GetCityByRegion(int regionId)

@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Identity;
 using Shipping.Application.Abstraction;
 using Shipping.Application.Abstraction.Branch.Service;
 using Shipping.Application.Abstraction.CitySettings.Service;
+using Shipping.Application.Abstraction.Courier;
 using Shipping.Application.Abstraction.CourierReport.Service;
+using Shipping.Application.Abstraction.Employee;
+using Shipping.Application.Abstraction.Merchant;
 using Shipping.Application.Abstraction.OrderReport.Service;
 using Shipping.Application.Abstraction.Orders.Service;
 using Shipping.Application.Abstraction.Product.Service;
@@ -14,6 +17,9 @@ using Shipping.Application.Abstraction.SpecialCourierRegion.Serivce;
 using Shipping.Application.Services.BranchServices;
 using Shipping.Application.Services.CitySettingServices;
 using Shipping.Application.Services.CourierReportServices;
+using Shipping.Application.Services.CourierServices;
+using Shipping.Application.Services.EmployeeServices;
+using Shipping.Application.Services.MerchantServices;
 using Shipping.Application.Services.OrderReportServices;
 using Shipping.Application.Services.OrderSerivces;
 using Shipping.Application.Services.ProductServices;
@@ -44,6 +50,9 @@ public class ServiceManager : IServiceManager
     private readonly Lazy<ICitySettingService> _citySettingService;
     private readonly Lazy<ISpecialCourierRegionService> _specialCourierRegionService;
     private readonly Lazy<IOrderReportService> _orderReportService;
+    private readonly Lazy<ICourierService> _courierService;
+    private readonly Lazy<IEmployeeService> _employeeService;
+    private readonly Lazy<IMerchantService> _merchantService;
 
     public ServiceManager(IUnitOfWork unitOfWork, IMapper mapper, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
     {
@@ -56,6 +65,9 @@ public class ServiceManager : IServiceManager
         _citySettingService = new Lazy<ICitySettingService>(() => new CitySettingService(unitOfWork, mapper));
         _specialCourierRegionService = new Lazy<ISpecialCourierRegionService>(() => new SpecialCourierRegionService(unitOfWork, mapper));
         _orderReportService = new Lazy<IOrderReportService>(() => new OrderReportService(unitOfWork, mapper, userManager));
+        _courierService = new Lazy<ICourierService>(() => new CourierService(unitOfWork, userManager, mapper));
+        _employeeService = new Lazy<IEmployeeService>(() => new EmployeeService(unitOfWork, mapper));
+        _merchantService = new Lazy<IMerchantService>(() => new MerchantService(unitOfWork, mapper));
     }
 
     // Properties to access the services
@@ -68,4 +80,7 @@ public class ServiceManager : IServiceManager
     public ISpecialCityCostService specialCityCostService => _specialCityCostService.Value;
     public ICitySettingService citySettingService => _citySettingService.Value;
     public ISpecialCourierRegionService specialCourierRegionService => _specialCourierRegionService.Value;
+    public ICourierService courierService => _courierService.Value;
+    public IEmployeeService employeeService => _employeeService.Value;
+    public IMerchantService merchantService => _merchantService.Value;
 }

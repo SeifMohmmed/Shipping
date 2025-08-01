@@ -2,8 +2,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shipping.Application.Abstraction.Auth;
+using Shipping.Application.Abstraction.Dashboard;
 using Shipping.Application.Abstraction.User;
 using Shipping.Domain.Repositories;
+using Shipping.Infrastructure.DashboardServices;
 using Shipping.Infrastructure.Persistence;
 using Shipping.Infrastructure.Repositories;
 using Shipping.Infrastructure.RoleServices;
@@ -44,6 +46,8 @@ public static class ServiceCollectionExtentions
         services.AddScoped<IUserService, UserService>();
 
         services.AddScoped<IRoleService, RoleService>();
+
+        services.AddScoped<IDashboardService, DashboardService>();
 
     }
 }
