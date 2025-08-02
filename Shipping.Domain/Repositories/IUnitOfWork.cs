@@ -10,6 +10,9 @@ public interface IUnitOfWork : IAsyncDisposable
 
     ISpecialCourierRegionRepository GetSpecialCourierRegionRepository();
 
+    IEmployeeRepository GetAllEmployeesAsync();
+
+    IMerchantRepository GetAllMerchantAsync();
 
     ISpecialCityCostRepository GetSpecialCityCostRepository();
 
