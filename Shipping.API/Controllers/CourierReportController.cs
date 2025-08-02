@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Shipping.API.Filters;
 using Shipping.Application.Abstraction;
 using Shipping.Application.Abstraction.CourierReport.DTOs;
 using Shipping.Domain.Helpers;
@@ -9,6 +10,8 @@ namespace Shipping.API.Controllers;
 public class CourierReportController(IServiceManager _serviceManager) : ControllerBase
 {
     [HttpGet]
+    [HasPermission(Permissions.ViewCouriers)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<GetAllCourierOrderCountDTO>>> GetAllReports([FromQuery] PaginationParameters pramter)
     {
         var CourierReports =
@@ -20,6 +23,7 @@ public class CourierReportController(IServiceManager _serviceManager) : Controll
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [HasPermission(Permissions.ViewCouriers)]
     public async Task<ActionResult<GetAllCourierOrderCountDTO>> GetBranch(int id, [FromQuery] PaginationParameters parameter)
     {
         try

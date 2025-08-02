@@ -26,6 +26,7 @@ public class Order
     public OrderStatus Status { get; set; }
 
     public OrderType OrderTypes { get; set; }
+
     //----------- Ids From User ---------------------------------
     public string MerchantId { get; set; } = string.Empty;
 
@@ -36,6 +37,7 @@ public class Order
     public virtual ICollection<CourierReport> CouriersReport { get; set; } = [];
 
     //------------- Branch ---------------------------------------
+
     [ForeignKey(nameof(Branch))]
     public int BranchId { get; set; }
 
@@ -56,15 +58,14 @@ public class Order
     public virtual CitySetting? CitySetting { get; set; }
 
     //------------- ShippingType ------------------------------
+
     [ForeignKey(nameof(ShippingType))]
     public int ShippingTypeId { get; set; }
 
     public virtual ShippingType? ShippingType { get; set; }
 
     //----------------------------------------------------------------------
-
     public PaymentType? PaymentType { get; set; }
-
 
     public virtual ICollection<Product>? Products { get; set; }
 

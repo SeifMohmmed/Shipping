@@ -11,7 +11,6 @@ public class ShippingType
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-    //-------------  Order ------------------------------
     public virtual ICollection<Order> Orders { get; set; } = [];
 
 }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Shipping.Application.Abstraction.Auth;
+using Shipping.Application.Abstraction.Roles;
 using Shipping.Application.Abstraction.Roles.DTO;
 using Shipping.Domain.Entities;
 using Shipping.Domain.Helpers;

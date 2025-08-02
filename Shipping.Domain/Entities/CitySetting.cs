@@ -18,14 +18,10 @@ public class CitySetting
 
     public virtual Region Region { get; set; }
 
-    //-------------  Order ------------------------------
     public virtual ICollection<Order> Orders { get; set; } = [];
 
-
-    //-------------  SpecialPickup ------------------------------
     public virtual ICollection<SpecialCityCost> SpecialPickups { get; set; } = [];
 
-    //------------- ICollection Users ------------------------------
     public virtual ICollection<ApplicationUser> Users { get; set; } = [];
 
 }

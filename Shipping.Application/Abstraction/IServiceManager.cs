@@ -7,15 +7,19 @@ using Shipping.Application.Abstraction.Merchant;
 using Shipping.Application.Abstraction.OrderReport.Service;
 using Shipping.Application.Abstraction.Orders.Service;
 using Shipping.Application.Abstraction.Product.Service;
+using Shipping.Application.Abstraction.Region;
 using Shipping.Application.Abstraction.ShippingType.Serivce;
 using Shipping.Application.Abstraction.SpecialCityCost.Service;
 using Shipping.Application.Abstraction.SpecialCourierRegion.Serivce;
+using Shipping.Application.Abstraction.WeightSetting;
 
 namespace Shipping.Application.Abstraction;
 public interface IServiceManager
 {
     // Define all the services that the service manager will provide
     public IProductService productService { get; }
+    public IRegionService regionService { get; }
+    public IWeightSettingService weightSettingService { get; }
     public ICourierReportService courierReportService { get; }
     public IShippingTypeService shippingTypeService { get; }
     public IOrderService orderService { get; }

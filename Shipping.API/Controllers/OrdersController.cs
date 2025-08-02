@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Shipping.API.Filters;
 using Shipping.Application.Abstraction;
 using Shipping.Application.Abstraction.Orders.DTO;
 using Shipping.Domain.Enums;
@@ -10,6 +11,7 @@ namespace Shipping.API.Controllers;
 public class OrdersController(IServiceManager _serviceManager) : ControllerBase
 {
     [HttpGet]
+    [HasPermission(Permissions.ViewOrders)]
     public async Task<ActionResult<IEnumerable<OrderWithProductsDTO>>> GetAll([FromQuery] PaginationParameters pramter)
     {
         var orders = await _serviceManager.orderService.GetOrdersAsync(pramter);
@@ -21,6 +23,7 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [HasPermission(Permissions.ViewOrders)]
     public async Task<ActionResult<OrderWithProductsDTO>> GetById(int id)
     {
         var order = await _serviceManager.orderService.GetOrderAsync(id);
@@ -35,6 +38,7 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [HasPermission(Permissions.AddOrders)]
     public async Task<ActionResult<AddOrderDTO>> AddOrder(AddOrderDTO DTO)
     {
         var order = await _serviceManager.orderService.AddAsync(DTO);
@@ -47,6 +51,7 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [HasPermission(Permissions.UpdateOrders)]
     public async Task<ActionResult> UpdateOrder(int id, [FromBody] UpdateOrderDTO DTO)
     {
         try
@@ -65,6 +70,7 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [HasPermission(Permissions.DeleteOrders)]
     public async Task<ActionResult> DeleteOrder(int id)
     {
         try
@@ -83,6 +89,7 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
     [HttpGet("GetAllOrderByStatus")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [HasPermission(Permissions.ViewOrders)]
     public async Task<IActionResult> GetAllOrderByStatus(OrderStatus status, [FromQuery] PaginationParameters pramter)
     {
         try
@@ -112,6 +119,7 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
 
 
     [HttpPost("ChangeOrderStatusToPending/{id}")]
+    [HasPermission(Permissions.UpdateOrders)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -133,6 +141,7 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [HasPermission(Permissions.UpdateOrders)]
     public async Task<IActionResult> ChangeOrderStatusToDeclined(int id)
     {
         try
@@ -170,6 +179,7 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [HasPermission(Permissions.UpdateOrders)]
     public async Task<IActionResult> AssignOrderToCourier(int OrderId, string courierId)
     {
         if (string.IsNullOrEmpty(courierId))

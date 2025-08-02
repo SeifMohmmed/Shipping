@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Shipping.Application.Abstraction.Auth;
+using Shipping.API.Filters;
+using Shipping.Application.Abstraction.Roles;
 using Shipping.Application.Abstraction.Roles.DTO;
+using Shipping.Domain.Helpers;
 
 namespace Shipping.API.Controllers;
 [Route("api/[controller]")]
@@ -8,6 +10,7 @@ namespace Shipping.API.Controllers;
 public class RolesController(IRoleService roleService) : ControllerBase
 {
     [HttpGet]
+    [HasPermission(Permissions.ViewPermissions)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var result = await roleService.GetAllRolesAsync(cancellationToken);
@@ -15,7 +18,8 @@ public class RolesController(IRoleService roleService) : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id}")]
+    [HasPermission(Permissions.ViewPermissions)]
     public async Task<IActionResult> GetById(string id, CancellationToken cancellationToken)
     {
         var result = await roleService.GetRoleByIdAsync(id, cancellationToken);
@@ -27,6 +31,9 @@ public class RolesController(IRoleService roleService) : ControllerBase
     }
 
     [HttpPost]
+    [HasPermission(Permissions.AddPermissions)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Add(CreateRoleRequestDTO createRoleRequestDTO, CancellationToken cancellationToken)
     {
         var result = await roleService.CreateRoleAsync(createRoleRequestDTO, cancellationToken);
@@ -38,6 +45,9 @@ public class RolesController(IRoleService roleService) : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [HasPermission(Permissions.UpdatePermissions)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Update(string id, CreateRoleRequestDTO createRoleRequestDTO, CancellationToken cancellationToken)
     {
         var result =
@@ -50,6 +60,9 @@ public class RolesController(IRoleService roleService) : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [HasPermission(Permissions.DeletePermissions)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken)
     {
         var result =

@@ -9,6 +9,15 @@ namespace Shipping.Application.Services.ProductServices;
 public class ProductService(IUnitOfWork _unitOfWork,
     IMapper _mapper) : IProductService
 {
+    //Get All Products
+    public async Task<IEnumerable<ProductDTO>> GetProductsAsync(PaginationParameters pramter)
+    => _mapper.Map<IEnumerable<ProductDTO>>(await _unitOfWork.GetRepository<Product, int>().GetAllAsync(pramter));
+
+    // Get Product by Id 
+    public async Task<ProductDTO> GetProductAsync(int id)
+    => _mapper.Map<ProductDTO>(await _unitOfWork.GetRepository<Product, int>().GetByIdAsync(id));
+
+
     // Add Product  
     public async Task<ProductDTO> AddAsync(ProductDTO DTO)
     {
@@ -19,6 +28,24 @@ public class ProductService(IUnitOfWork _unitOfWork,
         await _unitOfWork.CompleteAsync();
 
         return _mapper.Map<ProductDTO>(product);
+    }
+
+
+    //Update Proudct
+    public async Task UpdateAsync(int id, UpdateProductDTO DTO)
+    {
+        var productRepo = _unitOfWork.GetRepository<Product, int>();
+
+        var existingProduct = await productRepo.GetByIdAsync(id);
+
+        if (existingProduct is null)
+            throw new KeyNotFoundException($"Product with ID {id} not found.");
+
+        _mapper.Map(DTO, existingProduct);
+
+        productRepo.UpdateAsync(existingProduct);
+
+        await _unitOfWork.CompleteAsync();
     }
 
     // Delete Product  
@@ -32,35 +59,6 @@ public class ProductService(IUnitOfWork _unitOfWork,
             throw new KeyNotFoundException($"Product with ID {id} not found.");
 
         await productRepo.DeleteAsync(id);
-
-        await _unitOfWork.CompleteAsync();
-    }
-
-    // Get Product by Id 
-    public async Task<ProductDTO> GetProductAsync(int id)
-    {
-        return _mapper.Map<ProductDTO>(await _unitOfWork.GetRepository<Product, int>().GetByIdAsync(id));
-    }
-
-    //Get All Products
-    public async Task<IEnumerable<ProductDTO>> GetProductsAsync(PaginationParameters pramter)
-    {
-        return
-            _mapper.Map<IEnumerable<ProductDTO>>(await _unitOfWork.GetRepository<Product, int>().GetAllAsync(pramter));
-    }
-
-    public async Task UpdateAsync(int id, UpdateProductDTO DTO)
-    {
-        var productRepo = _unitOfWork.GetRepository<Product, int>();
-
-        var existingProduct = await productRepo.GetByIdAsync(id);
-
-        if (existingProduct is null)
-            throw new KeyNotFoundException($"Product with ID {id} not found.");
-
-        _mapper.Map(DTO, existingProduct);
-
-        productRepo.UpdateAsync(existingProduct);
 
         await _unitOfWork.CompleteAsync();
     }
