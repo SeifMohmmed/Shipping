@@ -18,7 +18,6 @@ public class ApplicationUser : IdentityUser
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-    //----------- StoreName For Merchant -------------------------------  
     public string? StoreName { get; set; }
 
     public decimal? PickupPrice { get; set; }
@@ -28,6 +27,7 @@ public class ApplicationUser : IdentityUser
     public DeductionTypes? DeductionTypes { get; set; }
 
     public decimal? DeductionCompanyFromOrder { get; set; }
+
 
     [ForeignKey(nameof(Branch))]
     public int? BranchId { get; set; }
@@ -46,7 +46,5 @@ public class ApplicationUser : IdentityUser
     public virtual ICollection<SpecialCityCost> SpecialPickups { get; set; } = [];
 
     public virtual ICollection<SpecialCourierRegion> SpecialCourierRegion { get; set; } = [];
-
-    public List<RefreshToken>? RefreshTokens { get; set; }
 
 }

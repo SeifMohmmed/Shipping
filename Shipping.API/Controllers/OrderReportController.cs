@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Shipping.API.Filters;
 using Shipping.Application.Abstraction;
 using Shipping.Application.Abstraction.OrderReport.DTO;
 using Shipping.Domain.Helpers;
@@ -9,6 +10,7 @@ namespace Shipping.API.Controllers;
 public class OrderReportController(IServiceManager serviceManager) : ControllerBase
 {
     [HttpGet]
+    [HasPermission(Permissions.ViewOrderReports)]
     public async Task<ActionResult<IEnumerable<OrderReportToShowDTO>>> GetAll([FromQuery] OrderReportPramter pramter)
     {
         var AllOrderReport =
@@ -22,6 +24,7 @@ public class OrderReportController(IServiceManager serviceManager) : ControllerB
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [HasPermission(Permissions.ViewOrderReports)]
     public async Task<ActionResult<OrderReportDTO>> GetById(int id)
     {
         var OrderReport = await serviceManager.orderReportService.GetOrderReportAsync(id);
@@ -36,6 +39,7 @@ public class OrderReportController(IServiceManager serviceManager) : ControllerB
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [HasPermission(Permissions.UpdateOrderReports)]
     public async Task<ActionResult> Update(int id, [FromBody] OrderReportDTO DTO)
     {
         try
@@ -52,6 +56,7 @@ public class OrderReportController(IServiceManager serviceManager) : ControllerB
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [HasPermission(Permissions.DeleteOrderReports)]
     public async Task<ActionResult> Delete(int id)
     {
         try

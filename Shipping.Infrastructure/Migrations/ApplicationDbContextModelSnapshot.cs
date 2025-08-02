@@ -569,7 +569,7 @@ namespace Shipping.Infrastructure.Migrations
                         {
                             Id = "01961d25-b4da-7184-a2a8-765486bd4857",
                             ConcurrencyStamp = "EAE00686-2608-4516-AD1B-F96CD87C475E",
-                            CreatedAt = new DateTime(2025, 8, 1, 15, 10, 52, 240, DateTimeKind.Local).AddTicks(9945),
+                            CreatedAt = new DateTime(2025, 8, 2, 23, 33, 42, 443, DateTimeKind.Local).AddTicks(1400),
                             IsDeleted = false,
                             Name = "Admin",
                             NormalizedName = "ADMIN"
@@ -578,7 +578,7 @@ namespace Shipping.Infrastructure.Migrations
                         {
                             Id = "01961d25-b4da-75a5-a1f4-a7aa10e421ed",
                             ConcurrencyStamp = "386C6E14-D0FD-40FF-80D0-74B419360EF0",
-                            CreatedAt = new DateTime(2025, 8, 1, 15, 10, 52, 253, DateTimeKind.Local).AddTicks(4674),
+                            CreatedAt = new DateTime(2025, 8, 2, 23, 33, 42, 455, DateTimeKind.Local).AddTicks(6632),
                             IsDeleted = false,
                             Name = "Courier",
                             NormalizedName = "COURIER"
@@ -587,7 +587,7 @@ namespace Shipping.Infrastructure.Migrations
                         {
                             Id = "01961d25-b4da-71e9-a488-1b8db232e984",
                             ConcurrencyStamp = "1420D50C-F54D-4503-88E8-A2EFA3BD7137",
-                            CreatedAt = new DateTime(2025, 8, 1, 15, 10, 52, 253, DateTimeKind.Local).AddTicks(4917),
+                            CreatedAt = new DateTime(2025, 8, 2, 23, 33, 42, 455, DateTimeKind.Local).AddTicks(6880),
                             IsDeleted = false,
                             Name = "Merchant",
                             NormalizedName = "MERCHANT"
@@ -710,7 +710,7 @@ namespace Shipping.Infrastructure.Migrations
                             Id = "0195d439-9ca1-7873-9c14-a4bc1c201593",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "0195d43b-a808-757b-9c3e-bf90c6091133",
-                            CreatedAt = new DateTime(2025, 8, 1, 15, 10, 52, 324, DateTimeKind.Local).AddTicks(962),
+                            CreatedAt = new DateTime(2025, 8, 2, 23, 33, 42, 520, DateTimeKind.Local).AddTicks(8182),
                             Email = "Seif123@gmail.com",
                             EmailConfirmed = false,
                             FullName = "Seif Admin",
@@ -718,7 +718,7 @@ namespace Shipping.Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "SEIF123@GMAIL.COM",
                             NormalizedUserName = "SEIF123@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEARAWSUYiucbqzORpU++pcOh/obASEtboF0jR21yVvy2uEvN9kXxGiPlF0pi48Vr9g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFsvTOd5GS7j9wQsJzWsdchl4MLS0yrzhK9+ajqjl8EKth0B2fJvypvCDQ6a+FC5AA==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "0195d43be3f271878cc37be7dfc34361",
                             TwoFactorEnabled = false,
@@ -1177,41 +1177,7 @@ namespace Shipping.Infrastructure.Migrations
                         .WithMany("Users")
                         .HasForeignKey("RegionId");
 
-                    b.OwnsMany("Shipping.Domain.Entities.RefreshToken", "RefreshTokens", b1 =>
-                        {
-                            b1.Property<string>("ApplicationUserId")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
-
-                            b1.Property<DateTime>("CreatedOn")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<DateTime>("ExpiresOn")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<DateTime?>("RevokedOn")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<string>("Token")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("ApplicationUserId", "Id");
-
-                            b1.ToTable("RefreshToken");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ApplicationUserId");
-                        });
-
                     b.Navigation("Branch");
-
-                    b.Navigation("RefreshTokens");
 
                     b.Navigation("Region");
                 });

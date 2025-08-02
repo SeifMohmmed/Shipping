@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Shipping.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -158,6 +158,7 @@ namespace Shipping.Infrastructure.Migrations
                     DeductionCompanyFromOrder = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     BranchId = table.Column<int>(type: "int", nullable: true),
                     RegionId = table.Column<int>(type: "int", nullable: true),
+                    CitySettingId = table.Column<int>(type: "int", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -180,6 +181,11 @@ namespace Shipping.Infrastructure.Migrations
                         name: "FK_AspNetUsers_Branches_BranchId",
                         column: x => x.BranchId,
                         principalTable: "Branches",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_CitySettings_CitySettingId",
+                        column: x => x.CitySettingId,
+                        principalTable: "CitySettings",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_AspNetUsers_Regions_RegionId",
@@ -418,6 +424,27 @@ namespace Shipping.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "OrderReports",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ReportDetails = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ReportDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    OrderId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderReports", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderReports_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Products",
                 columns: table => new
                 {
@@ -445,15 +472,15 @@ namespace Shipping.Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "CreatedAt", "IsDeleted", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "01961d25-b4da-7184-a2a8-765486bd4857", "EAE00686-2608-4516-AD1B-F96CD87C475E", new DateTime(2025, 7, 27, 21, 17, 49, 395, DateTimeKind.Local).AddTicks(2129), false, "Admin", "ADMIN" },
-                    { "01961d25-b4da-71e9-a488-1b8db232e984", "1420D50C-F54D-4503-88E8-A2EFA3BD7137", new DateTime(2025, 7, 27, 21, 17, 49, 407, DateTimeKind.Local).AddTicks(4403), false, "Merchant", "MERCHANT" },
-                    { "01961d25-b4da-75a5-a1f4-a7aa10e421ed", "386C6E14-D0FD-40FF-80D0-74B419360EF0", new DateTime(2025, 7, 27, 21, 17, 49, 407, DateTimeKind.Local).AddTicks(4124), false, "Courier", "COURIER" }
+                    { "01961d25-b4da-7184-a2a8-765486bd4857", "EAE00686-2608-4516-AD1B-F96CD87C475E", new DateTime(2025, 8, 2, 23, 33, 42, 443, DateTimeKind.Local).AddTicks(1400), false, "Admin", "ADMIN" },
+                    { "01961d25-b4da-71e9-a488-1b8db232e984", "1420D50C-F54D-4503-88E8-A2EFA3BD7137", new DateTime(2025, 8, 2, 23, 33, 42, 455, DateTimeKind.Local).AddTicks(6880), false, "Merchant", "MERCHANT" },
+                    { "01961d25-b4da-75a5-a1f4-a7aa10e421ed", "386C6E14-D0FD-40FF-80D0-74B419360EF0", new DateTime(2025, 8, 2, 23, 33, 42, 455, DateTimeKind.Local).AddTicks(6632), false, "Courier", "COURIER" }
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "Address", "BranchId", "CanceledOrder", "ConcurrencyStamp", "CreatedAt", "DeductionCompanyFromOrder", "DeductionTypes", "Email", "EmailConfirmed", "FullName", "IsDeleted", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "PickupPrice", "RegionId", "SecurityStamp", "StoreName", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "0195d439-9ca1-7873-9c14-a4bc1c201593", 0, null, null, null, "0195d43b-a808-757b-9c3e-bf90c6091133", new DateTime(2025, 7, 27, 21, 17, 49, 471, DateTimeKind.Local).AddTicks(8629), null, null, "Seif123@gmail.com", false, "Seif Admin", false, false, null, "SEIF123@GMAIL.COM", "SEIF123@GMAIL.COM", "AQAAAAIAAYagAAAAEDd/7v58/Pv27l5DvvI5krdZuN7OUbl5liki7lV/DFu/EtCm3EE8yuE2uloGVlVesg==", null, false, null, null, "0195d43be3f271878cc37be7dfc34361", null, false, "Seif123@gmail.com" });
+                columns: new[] { "Id", "AccessFailedCount", "Address", "BranchId", "CanceledOrder", "CitySettingId", "ConcurrencyStamp", "CreatedAt", "DeductionCompanyFromOrder", "DeductionTypes", "Email", "EmailConfirmed", "FullName", "IsDeleted", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "PickupPrice", "RegionId", "SecurityStamp", "StoreName", "TwoFactorEnabled", "UserName" },
+                values: new object[] { "0195d439-9ca1-7873-9c14-a4bc1c201593", 0, null, null, null, null, "0195d43b-a808-757b-9c3e-bf90c6091133", new DateTime(2025, 8, 2, 23, 33, 42, 520, DateTimeKind.Local).AddTicks(8182), null, null, "Seif123@gmail.com", false, "Seif Admin", false, false, null, "SEIF123@GMAIL.COM", "SEIF123@GMAIL.COM", "AQAAAAIAAYagAAAAEFsvTOd5GS7j9wQsJzWsdchl4MLS0yrzhK9+ajqjl8EKth0B2fJvypvCDQ6a+FC5AA==", null, false, null, null, "0195d43be3f271878cc37be7dfc34361", null, false, "Seif123@gmail.com" });
 
             migrationBuilder.InsertData(
                 table: "AspNetRoleClaims",
@@ -561,6 +588,11 @@ namespace Shipping.Infrastructure.Migrations
                 column: "BranchId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_CitySettingId",
+                table: "AspNetUsers",
+                column: "CitySettingId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_RegionId",
                 table: "AspNetUsers",
                 column: "RegionId");
@@ -590,6 +622,11 @@ namespace Shipping.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_CourierReports_OrderId",
                 table: "CourierReports",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderReports_OrderId",
+                table: "OrderReports",
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
@@ -665,6 +702,9 @@ namespace Shipping.Infrastructure.Migrations
                 name: "CourierReports");
 
             migrationBuilder.DropTable(
+                name: "OrderReports");
+
+            migrationBuilder.DropTable(
                 name: "Products");
 
             migrationBuilder.DropTable(
@@ -686,13 +726,13 @@ namespace Shipping.Infrastructure.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "CitySettings");
-
-            migrationBuilder.DropTable(
                 name: "ShippingTypes");
 
             migrationBuilder.DropTable(
                 name: "Branches");
+
+            migrationBuilder.DropTable(
+                name: "CitySettings");
 
             migrationBuilder.DropTable(
                 name: "Regions");

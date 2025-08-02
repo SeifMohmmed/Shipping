@@ -5,6 +5,7 @@ using Shipping.Application.Abstraction.CourierReport.DTOs;
 using Shipping.Application.Abstraction.OrderReport.DTO;
 using Shipping.Application.Abstraction.Orders.DTO;
 using Shipping.Application.Abstraction.Product.DTOs;
+using Shipping.Application.Abstraction.Region.DTO;
 using Shipping.Application.Abstraction.ShippingType.DTOs;
 using Shipping.Application.Abstraction.SpecialCityCost.DTO;
 using Shipping.Application.Abstraction.SpecialCourierRegion.DTO;
@@ -22,6 +23,12 @@ public class MappingProfile : Profile
         CreateMap<Product, ProductDTO>().ReverseMap();
 
         CreateMap<Product, UpdateProductDTO>().ReverseMap();
+        #endregion
+
+        #region Configration Of Region
+        CreateMap<Region, RegionDTO>()
+             .ForMember(dest => dest.CityName, op => op.MapFrom(src => src.CitySettings.Select(c => c.Name)))
+             .ReverseMap();
         #endregion
 
         #region Configuration of CourierReport
@@ -228,6 +235,9 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.PhoneNumber))
             .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
             .ReverseMap();
+
+        CreateMap<ApplicationUser, AccountProfileDTO>();
+
         #endregion
     }
 

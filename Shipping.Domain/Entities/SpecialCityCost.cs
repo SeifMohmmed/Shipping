@@ -12,13 +12,14 @@ public class SpecialCityCost
 
     public bool IsDeleted { get; set; } = false;
 
-    //-----------  CitySetting  ------------------------
     [ForeignKey(nameof(CitySetting))]
     public int CitySettingId { get; set; }
+
     public virtual CitySetting? CitySetting { get; set; }
 
-    //----------- Obj From User and ForeignKey MerchantId ---------------------------------
+
     [ForeignKey(nameof(Merchant))]
     public string MerchantId { get; set; } = string.Empty;
+
     public virtual ApplicationUser? Merchant { get; set; }
 }

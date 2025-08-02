@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Shipping.API.Filters;
 using Shipping.Application.Abstraction.User;
 using Shipping.Application.Abstraction.User.DTO;
+using Shipping.Domain.Helpers;
 
 namespace Shipping.API.Controllers;
 [Route("api/[controller]")]
@@ -9,6 +11,7 @@ public class UsersController(IUserService userService) : ControllerBase
 {
 
     [HttpPost("add-employee")]
+    [HasPermission(Permissions.AddEmployees)]
     public async Task<IActionResult> AddEmployee(AddEmployeeDTO DTO, CancellationToken cancellationToken)
     {
         var response =
@@ -21,6 +24,7 @@ public class UsersController(IUserService userService) : ControllerBase
     }
 
     [HttpPost("add-merchant")]
+    [HasPermission(Permissions.AddMerchants)]
     public async Task<IActionResult> AddMerchant(AddMerchantDTO addMerchantRequest, CancellationToken cancellationToken)
     {
         var response =
@@ -33,6 +37,7 @@ public class UsersController(IUserService userService) : ControllerBase
     }
 
     [HttpPost("add-courier")]
+    [HasPermission(Permissions.AddCouriers)]
     public async Task<IActionResult> AddCourier([FromBody] AddCourierDTO addCourierRequest, CancellationToken cancellationToken)
     {
         var response =

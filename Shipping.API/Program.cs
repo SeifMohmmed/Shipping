@@ -1,5 +1,6 @@
 using Shipping.API.Extensions;
 using Shipping.Application.Extentions;
+using Shipping.Domain.Entities;
 using Shipping.Infrastructure.Extentions;
 using Shipping.Infrastructure.Seeders;
 namespace Shipping.API
@@ -12,8 +13,8 @@ namespace Shipping.API
 
             // Add services to the container.
             builder.AddPresentation();
-
             builder.Services.AddInfrastructure(builder.Configuration);
+
 
             builder.Services.AddApplication();
 
@@ -32,6 +33,10 @@ namespace Shipping.API
             }
 
             app.UseHttpsRedirection();
+
+            app.MapGroup("/api/identity")
+                .WithTags("Identity")
+                .MapIdentityApi<ApplicationUser>();
 
             app.UseAuthorization();
 

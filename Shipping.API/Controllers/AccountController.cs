@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Shipping.Application.Abstraction.User;
 using System.Security.Claims;
 
 namespace Shipping.API.Controllers;
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class AccountController(IUserService userService) : ControllerBase
 {
 

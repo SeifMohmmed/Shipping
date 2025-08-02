@@ -1,6 +1,6 @@
 ﻿using Shipping.Application.Abstraction.Roles.DTO;
 
-namespace Shipping.Application.Abstraction.Auth;
+namespace Shipping.Application.Abstraction.Roles;
 public interface IRoleService
 {
     Task<IEnumerable<RoleResponseDTO>> GetAllRolesAsync(CancellationToken cancellationToken = default);

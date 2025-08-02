@@ -1,16 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Shipping.Application.Abstraction.Auth;
 using Shipping.Application.Abstraction.Dashboard;
-using Shipping.Application.Abstraction.User;
+using Shipping.Application.Abstraction.Roles;
+using Shipping.Domain.Entities;
+using Shipping.Domain.Helpers;
 using Shipping.Domain.Repositories;
 using Shipping.Infrastructure.DashboardServices;
 using Shipping.Infrastructure.Persistence;
 using Shipping.Infrastructure.Repositories;
 using Shipping.Infrastructure.RoleServices;
 using Shipping.Infrastructure.Seeders;
-using Shipping.Infrastructure.UserServices;
 
 namespace Shipping.Infrastructure.Extentions;
 public static class ServiceCollectionExtentions
@@ -39,15 +39,32 @@ public static class ServiceCollectionExtentions
         });
 
 
+        services.AddIdentityApiEndpoints<ApplicationUser>()
+            .AddRoles<ApplicationRole>()
+            .AddEntityFrameworkStores<ApplicationDbContext>();
+
+
+        services.AddAuthorization(options =>
+        {
+            foreach (var permission in Permissions.GetAllPermissions())
+            {
+                if (permission is not null)
+                {
+                    options.AddPolicy(permission, policy =>
+                        policy.RequireClaim(Permissions.Type, permission));
+                }
+            }
+        });
+
+
         services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<IShippingSeeder, ShippingSeeder>();
-        services.AddScoped<IUserService, UserService>();
 
         services.AddScoped<IRoleService, RoleService>();
 
         services.AddScoped<IDashboardService, DashboardService>();
+        services.AddScoped<IShippingSeeder, ShippingSeeder>();
 
     }
 }

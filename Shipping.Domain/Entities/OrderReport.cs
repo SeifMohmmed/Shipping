@@ -10,8 +10,6 @@ public class OrderReport
 
     public DateTime ReportDate { get; set; } = DateTime.Now;
 
-    //----------- Obj From Order and ForeignKey OrderId ---------------------------------
-
     [Required, ForeignKey(nameof(Order))]
     public int? OrderId { get; set; }
 

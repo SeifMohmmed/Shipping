@@ -11,9 +11,11 @@ using Shipping.Application.Abstraction.Merchant;
 using Shipping.Application.Abstraction.OrderReport.Service;
 using Shipping.Application.Abstraction.Orders.Service;
 using Shipping.Application.Abstraction.Product.Service;
+using Shipping.Application.Abstraction.Region;
 using Shipping.Application.Abstraction.ShippingType.Serivce;
 using Shipping.Application.Abstraction.SpecialCityCost.Service;
 using Shipping.Application.Abstraction.SpecialCourierRegion.Serivce;
+using Shipping.Application.Abstraction.WeightSetting;
 using Shipping.Application.Services.BranchServices;
 using Shipping.Application.Services.CitySettingServices;
 using Shipping.Application.Services.CourierReportServices;
@@ -23,9 +25,11 @@ using Shipping.Application.Services.MerchantServices;
 using Shipping.Application.Services.OrderReportServices;
 using Shipping.Application.Services.OrderSerivces;
 using Shipping.Application.Services.ProductServices;
+using Shipping.Application.Services.RegionServices;
 using Shipping.Application.Services.ShippingTypeServices;
 using Shipping.Application.Services.SpecialCityCostServices;
 using Shipping.Application.Services.SpecialCourierRegionServices;
+using Shipping.Application.Services.WeightSettingServices;
 using Shipping.Domain.Entities;
 using Shipping.Domain.Repositories;
 
@@ -42,6 +46,8 @@ public class ServiceManager : IServiceManager
     // This can help improve performance by avoiding unnecessary instantiation of services that may not be used.
 
     private readonly Lazy<IProductService> _productService;
+    private readonly Lazy<IRegionService> _regionService;
+    private readonly Lazy<IWeightSettingService> _weightSettingService;
     private readonly Lazy<ICourierReportService> _courierReportService;
     private readonly Lazy<IShippingTypeService> _shippingTypeService;
     private readonly Lazy<IOrderService> _orderService;
@@ -57,6 +63,8 @@ public class ServiceManager : IServiceManager
     public ServiceManager(IUnitOfWork unitOfWork, IMapper mapper, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
     {
         _productService = new Lazy<IProductService>(() => new ProductService(unitOfWork, mapper));
+        _regionService = new Lazy<IRegionService>(() => new RegionService(unitOfWork, mapper));
+        _weightSettingService = new Lazy<IWeightSettingService>(() => new WeightSettingService(unitOfWork, mapper));
         _courierReportService = new Lazy<ICourierReportService>(() => new CourierReportService(unitOfWork, mapper));
         _shippingTypeService = new Lazy<IShippingTypeService>(() => new ShippingTypeService(unitOfWork, mapper));
         _orderService = new Lazy<IOrderService>(() => new OrderService(unitOfWork, mapper, userManager, httpContextAccessor));
@@ -72,6 +80,8 @@ public class ServiceManager : IServiceManager
 
     // Properties to access the services
     public IProductService productService => _productService.Value;
+    public IRegionService regionService => _regionService.Value;
+    public IWeightSettingService weightSettingService => _weightSettingService.Value;
     public ICourierReportService courierReportService => _courierReportService.Value;
     public IShippingTypeService shippingTypeService => _shippingTypeService.Value;
     public IOrderService orderService => _orderService.Value;

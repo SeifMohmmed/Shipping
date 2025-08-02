@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Shipping.API.Filters;
 using Shipping.Application.Abstraction;
 using Shipping.Application.Abstraction.ShippingType.DTOs;
 using Shipping.Domain.Helpers;
@@ -10,6 +11,7 @@ public class ShippingTypeController(IServiceManager _serviceManager) : Controlle
 {
 
     [HttpGet]
+    [HasPermission(Permissions.ViewSettings)]
     public async Task<ActionResult<IEnumerable<ShippingTypeDTO>>> GetAll([FromQuery] PaginationParameters pramter)
     {
         var shippingtypes = await _serviceManager.shippingTypeService.GetAllShippingTypeAsync(pramter);
@@ -20,6 +22,7 @@ public class ShippingTypeController(IServiceManager _serviceManager) : Controlle
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [HasPermission(Permissions.ViewSettings)]
     public async Task<ActionResult<ShippingTypeDTO>> Get(int id)
     {
         var shippingtype = await _serviceManager.shippingTypeService.GetShippingTypeAsync(id);
@@ -34,6 +37,7 @@ public class ShippingTypeController(IServiceManager _serviceManager) : Controlle
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [HasPermission(Permissions.AddSettings)]
     public async Task<ActionResult<ShippingTypeDTO>> Add(ShippingTypeAddDTO dto)
     {
         if (dto is null)
@@ -48,6 +52,7 @@ public class ShippingTypeController(IServiceManager _serviceManager) : Controlle
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [HasPermission(Permissions.UpdateSettings)]
     public async Task<ActionResult<ShippingTypeDTO>> Update(int id, [FromBody] ShippingTypeUpdateDTO dto)
     {
         try
@@ -64,6 +69,7 @@ public class ShippingTypeController(IServiceManager _serviceManager) : Controlle
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [HasPermission(Permissions.DeleteSettings)]
     public async Task<ActionResult> Delete(int id)
     {
         try

@@ -13,7 +13,7 @@ public class Product
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-    //-----------  Order ---------------------------------
+
     [ForeignKey(nameof(Order))]
     public int OrderId { get; set; }
 
