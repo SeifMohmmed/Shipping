@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Shipping.Application.Abstraction.OrderReport.DTO;
 using Shipping.Application.Abstraction.OrderReport.Service;
 using Shipping.Domain.Entities;
@@ -8,58 +9,78 @@ using Shipping.Domain.Helpers;
 using Shipping.Domain.Repositories;
 
 namespace Shipping.Application.Services.OrderReportServices;
-public class OrderReportService(IUnitOfWork unitOfWork,
+public class OrderReportService(ILogger<OrderReportService> logger,
+    IUnitOfWork unitOfWork,
     IMapper mapper,
     UserManager<ApplicationUser> userManager) : IOrderReportService
 {
     // Get All Order Report By Pramter(Sort , Pagenation)
     public async Task<IEnumerable<OrderReportToShowDTO>> GetAllOrderReportAsync(OrderReportPramter pramter)
     {
+        logger.LogInformation("Fetching all order reports with parameters: {@Parameters}", pramter);
+
         var orderReports = await unitOfWork.GetOrderReportRepository().GetOrderReportByPramter(pramter);
-        var orderReportDTO = await GetMerchantNameAndAmountReceivedAndShippingCostPaid(orderReports);
+
+        var orderReportDTO =
+            await GetMerchantNameAndAmountReceivedAndShippingCostPaid(orderReports);
 
         return orderReportDTO;
     }
 
     // Get Order Report By Id
     public async Task<OrderReportDTO> GetOrderReportAsync(int id)
-    => mapper.Map<OrderReportDTO>(await unitOfWork.GetOrderReportRepository().GetByIdAsync(id));
+    {
+        logger.LogInformation("Fetching order report with ID: {Id}", id);
+
+        var orderReport = await unitOfWork.GetOrderReportRepository().GetByIdAsync(id);
+
+        if (orderReport is null)
+            throw new NotFoundException(nameof(OrderReport), id.ToString());
+
+        return mapper.Map<OrderReportDTO>(orderReport);
+    }
 
     //Add Order Report
     public async Task AddAsync(OrderReportDTO DTO)
     {
+        logger.LogInformation("Adding new order report: {@OrderReport}", DTO);
+
         await unitOfWork.GetRepository<OrderReport, int>().AddAsync(mapper.Map<OrderReport>(DTO));
-        await unitOfWork.CompleteAsync();
-    }
-
-    //Delete Order Report
-    public async Task DeleteAsync(int id)
-    {
-        var orderReportRepo = unitOfWork.GetRepository<OrderReport, int>();
-        var existingOrderReport = await orderReportRepo.GetByIdAsync(id);
-
-        if (existingOrderReport is null)
-            throw new KeyNotFoundException($"OrderReport with ID {id} not found.");
-
-        await orderReportRepo.DeleteAsync(id);
         await unitOfWork.CompleteAsync();
     }
 
     //Update Order Report
     public async Task UpdateAsync(int id, OrderReportDTO DTO)
     {
+        logger.LogInformation("Updating order report with ID: {Id}", id);
+
         var orderReportRepo = unitOfWork.GetRepository<OrderReport, int>();
         var existingOrderReport = await orderReportRepo.GetByIdAsync(id, include:
             p => p
             .Include(r => r.Order));
 
         if (existingOrderReport is null)
-            throw new KeyNotFoundException($"OrderReport with ID {DTO.Id} not found.");
+            throw new NotFoundException(nameof(OrderReport), id.ToString());
 
         mapper.Map(DTO, existingOrderReport);
 
         orderReportRepo.UpdateAsync(existingOrderReport);
 
+        await unitOfWork.CompleteAsync();
+    }
+
+    //Delete Order Report
+    public async Task DeleteAsync(int id)
+    {
+        logger.LogInformation("Attempting to delete order report with ID: {Id}", id);
+
+        var orderReportRepo = unitOfWork.GetRepository<OrderReport, int>();
+        var existingOrderReport = await orderReportRepo.GetByIdAsync(id);
+
+        if (existingOrderReport is null)
+            throw new NotFoundException(nameof(OrderReport), id.ToString());
+
+        await orderReportRepo.DeleteAsync(id);
         await unitOfWork.CompleteAsync();
     }
 

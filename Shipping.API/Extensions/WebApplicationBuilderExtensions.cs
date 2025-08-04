@@ -1,4 +1,6 @@
 ﻿using Microsoft.OpenApi.Models;
+using Serilog;
+using Shipping.API.Middlewares;
 
 namespace Shipping.API.Extensions;
 
@@ -8,7 +10,9 @@ public static class WebApplicationBuilderExtensions
     {
         // Add services to the container.
         builder.Services.AddAuthentication();
+
         builder.Services.AddControllers();
+
         builder.Services.AddEndpointsApiExplorer();
 
         builder.Services.AddSwaggerGen(c =>
@@ -31,5 +35,11 @@ public static class WebApplicationBuilderExtensions
 
             });
         });
+
+        builder.Services.AddScoped<ErrorHandlingMiddleware>();
+        builder.Services.AddScoped<RequestTimeLoggingMiddleware>();
+
+        builder.Host.UseSerilog((context, configuration) =>
+        configuration.ReadFrom.Configuration(context.Configuration));
     }
 }

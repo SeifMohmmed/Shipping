@@ -5,12 +5,12 @@ using Microsoft.Extensions.Logging;
 using Shipping.Application.Abstraction.User;
 using Shipping.Application.Abstraction.User.DTO;
 using Shipping.Domain.Entities;
+using Shipping.Domain.Helpers;
 using Shipping.Domain.Repositories;
 
 namespace Shipping.Application.Services.UserSerivces;
 public class UserService(ILogger<UserService> logger,
      IUserContext userContext,
-    IUserStore<ApplicationUser> userStore,
     UserManager<ApplicationUser> userManager,
     RoleManager<ApplicationRole> roleManager,
     IMapper mapper,
@@ -19,6 +19,8 @@ public class UserService(ILogger<UserService> logger,
     //Get Accout Profile Data
     public async Task<AccountProfileDTO?> GetAccountProfileAsync(string userId, CancellationToken cancellationToken = default)
     {
+        logger.LogInformation("Retrieving account profile for user ID: {UserId}", userId);
+
         var accountDetails = await userManager.Users.FirstAsync(u => u.Id == userId);
 
         return mapper.Map<AccountProfileDTO>(accountDetails);
@@ -29,12 +31,12 @@ public class UserService(ILogger<UserService> logger,
     {
         var user = userContext.GetCurrentUser();
 
-        logger.LogInformation("Updating user: {UserId}, with {@Request}", user!.Id, request);
+        logger.LogInformation("Updating user details for user ID: {UserId} with data: {@UpdateRequest}", user!.Id, request);
 
-        var dbUser = await userStore.FindByIdAsync(user!.Id, cancellationToken);
+        var dbUser = await userManager.FindByIdAsync(user!.Id);
 
         if (dbUser is null)
-            throw new KeyNotFoundException($"User with ID {user.Id} not found.");
+            throw new NotFoundException(nameof(ApplicationUser), user.Id.ToString());
 
         dbUser.FullName = request.FullName;
         dbUser.IsDeleted = request.IsDeleted;
@@ -48,19 +50,19 @@ public class UserService(ILogger<UserService> logger,
         dbUser.DeductionCompanyFromOrder = request.DeductionCompanyFromOrder;
         dbUser.PhoneNumber = request.PhoneNumber;
 
-        await userStore.UpdateAsync(dbUser, cancellationToken);
+        await userManager.UpdateAsync(dbUser);
     }
 
     //Assign User Roles
     public async Task AssignUserRoles(AssignUserRoles request)
     {
-        logger.LogInformation("Assigning user role: {@Request}", request);
+        logger.LogInformation("Assigning role to user: {@Request}", request);
 
         var user = await userManager.FindByEmailAsync(request.UserEmail)
-            ?? throw new KeyNotFoundException($"User with Email {request.UserEmail} not found.");
+            ?? throw new NotFoundException(nameof(ApplicationUser), request.UserEmail);
 
         var role = await roleManager.FindByNameAsync(request.RoleName)
-            ?? throw new KeyNotFoundException($"User with Role {request.RoleName} not found.");
+            ?? throw new NotFoundException(nameof(ApplicationUser), request.RoleName);
 
         await userManager.AddToRoleAsync(user, role.Name!);
     }
@@ -68,13 +70,13 @@ public class UserService(ILogger<UserService> logger,
     //Unassign User Roles
     public async Task UnassignUserRoles(UnassignUserRoles request)
     {
-        logger.LogInformation("Unassigning user role: {@Request}", request);
+        logger.LogInformation("Unassigning role from user: {@Request}", request);
 
         var user = await userManager.FindByEmailAsync(request.UserEmail)
-            ?? throw new KeyNotFoundException($"User with Email {request.UserEmail} not found.");
+            ?? throw new NotFoundException(nameof(ApplicationUser), request.UserEmail);
 
         var role = await roleManager.FindByNameAsync(request.RoleName)
-            ?? throw new KeyNotFoundException($"User with Role {request.RoleName} not found.");
+            ?? throw new NotFoundException(nameof(ApplicationUser), request.RoleName);
 
         await userManager.RemoveFromRoleAsync(user, role.Name!);
 
@@ -83,6 +85,8 @@ public class UserService(ILogger<UserService> logger,
     // Add Employee ==> Registers a new employee user in the system.
     public async Task<string> AddEmployeeAsync(AddEmployeeDTO addEmployeeDTO, CancellationToken cancellationToken = default)
     {
+        logger.LogInformation("Adding employee: {@AddEmployeeDTO}", addEmployeeDTO);
+
         if (await userManager.Users.AnyAsync(u => u.Email.Equals(addEmployeeDTO.Email)))
             return "Another user with the same Email is already exist";
 
@@ -100,6 +104,8 @@ public class UserService(ILogger<UserService> logger,
     // Add Merchant ==> Creates a new merchant user, assigns the merchant role, and stores any special city delivery costs.
     public async Task<string> AddMerchantAsync(AddMerchantDTO addMerchantDTO, CancellationToken cancellationToken = default)
     {
+        logger.LogInformation("Adding merchant: {@AddMerchantDTO}", addMerchantDTO);
+
         if (await userManager.Users.AnyAsync(u => u.Email.Equals(addMerchantDTO.Email)))
             return "Another user with the same Email is already exist";
 
@@ -128,6 +134,8 @@ public class UserService(ILogger<UserService> logger,
     // Add Courier ==> Creates a new courier user, assigns the courier role, and stores their special regions.
     public async Task<string> AddCourierAsync(AddCourierDTO addCourierDTO, CancellationToken cancellationToken = default)
     {
+        logger.LogInformation("Adding courier: {@AddCourierDTO}", addCourierDTO);
+
         if (await userManager.Users.AnyAsync(u => u.Email.Equals(addCourierDTO.Email)))
             return "Another user with the same Email is already exist";
 

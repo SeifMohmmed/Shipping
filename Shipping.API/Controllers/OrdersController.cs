@@ -8,13 +8,13 @@ using Shipping.Domain.Helpers;
 namespace Shipping.API.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-public class OrdersController(IServiceManager _serviceManager) : ControllerBase
+public class OrdersController(IServiceManager serviceManager) : ControllerBase
 {
     [HttpGet]
     [HasPermission(Permissions.ViewOrders)]
     public async Task<ActionResult<IEnumerable<OrderWithProductsDTO>>> GetAll([FromQuery] PaginationParameters pramter)
     {
-        var orders = await _serviceManager.orderService.GetOrdersAsync(pramter);
+        var orders = await serviceManager.orderService.GetOrdersAsync(pramter);
 
         return Ok(orders);
     }
@@ -26,10 +26,7 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
     [HasPermission(Permissions.ViewOrders)]
     public async Task<ActionResult<OrderWithProductsDTO>> GetById(int id)
     {
-        var order = await _serviceManager.orderService.GetOrderAsync(id);
-
-        if (order is null)
-            return NotFound($"Order with id {id} was not found.");
+        var order = await serviceManager.orderService.GetOrderAsync(id);
 
         return Ok(order);
     }
@@ -41,7 +38,7 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
     [HasPermission(Permissions.AddOrders)]
     public async Task<ActionResult<AddOrderDTO>> AddOrder(AddOrderDTO DTO)
     {
-        var order = await _serviceManager.orderService.AddAsync(DTO);
+        var order = await serviceManager.orderService.AddAsync(DTO);
 
         return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
     }
@@ -54,16 +51,8 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
     [HasPermission(Permissions.UpdateOrders)]
     public async Task<ActionResult> UpdateOrder(int id, [FromBody] UpdateOrderDTO DTO)
     {
-        try
-        {
-            await _serviceManager.orderService.UpdateAsync(id, DTO);
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-
+        await serviceManager.orderService.UpdateAsync(id, DTO);
+        return NoContent();
     }
 
 
@@ -73,127 +62,78 @@ public class OrdersController(IServiceManager _serviceManager) : ControllerBase
     [HasPermission(Permissions.DeleteOrders)]
     public async Task<ActionResult> DeleteOrder(int id)
     {
-        try
-        {
-            await _serviceManager.orderService.DeleteAsync(id);
-            return NoContent();
-        }
-
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        await serviceManager.orderService.DeleteAsync(id);
+        return NoContent();
     }
 
 
-    [HttpGet("GetAllOrderByStatus")]
+    [HttpGet("status")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [HasPermission(Permissions.ViewOrders)]
-    public async Task<IActionResult> GetAllOrderByStatus(OrderStatus status, [FromQuery] PaginationParameters pramter)
+    public async Task<IActionResult> GetAllOrderByStatus([FromQuery] OrderStatus status, [FromQuery] PaginationParameters pramter)
     {
-        try
-        {
-            var orders = await _serviceManager.orderService.GetOrdersByStatus(status, pramter);
-
-            if (orders.Count() == 0)
-                return NotFound("No Orders Found !");
-
-            return Ok(orders);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-    }
-
-
-    [HttpGet("GetAllWaitingOrders")]
-    public async Task<ActionResult<IEnumerable<OrderWithProductsDTO>>> GetAllWaitingOrder([FromQuery] PaginationParameters pramter)
-    {
-        var orders =
-            await _serviceManager.orderService.GetAllWatingOrder(pramter);
+        var orders = await serviceManager.orderService.GetOrdersByStatus(status, pramter);
 
         return Ok(orders);
     }
 
 
-    [HttpPost("ChangeOrderStatusToPending/{id}")]
+    [HttpGet("status/waiting")]
+    [HasPermission(Permissions.ViewOrders)]
+    public async Task<ActionResult<IEnumerable<OrderWithProductsDTO>>> GetAllWaitingOrders([FromQuery] PaginationParameters pramter)
+    {
+        var orders =
+            await serviceManager.orderService.GetAllWatingOrder(pramter);
+
+        return Ok(orders);
+    }
+
+
+    [HttpPatch("{id}/status/pending")]
     [HasPermission(Permissions.UpdateOrders)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ChangeOrderStatusToPending(int id)
     {
-        try
-        {
-            await _serviceManager.orderService.ChangeOrderStatusToPending(id);
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        await serviceManager.orderService.ChangeOrderStatusToPending(id);
+
+        return NoContent();
     }
 
 
-    [HttpPost("ChangeOrderStatusToDeclined/{id}")]
+    [HttpPatch("{id}/status/declined")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [HasPermission(Permissions.UpdateOrders)]
     public async Task<IActionResult> ChangeOrderStatusToDeclined(int id)
     {
-        try
-        {
-            await _serviceManager.orderService.ChangeOrderStatusToDeclined(id);
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        await serviceManager.orderService.ChangeOrderStatusToDeclined(id);
+        return NoContent();
     }
 
 
-    [HttpPost("UpdateStatus/{id}")]
+    [HttpPatch("{id}/status")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateStatus(int id, OrderStatus status)
     {
-        try
-        {
-            await _serviceManager.orderService.ChangeOrderStatus(id, status);
-            return NoContent();
-        }
-
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        await serviceManager.orderService.ChangeOrderStatus(id, status);
+        return NoContent();
     }
 
 
-    [HttpPost("{OrderId}/AssignOrderToCourier/{courierId}")]
+    [HttpPost("{OrderId}/assign/{courierId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [HasPermission(Permissions.UpdateOrders)]
     public async Task<IActionResult> AssignOrderToCourier(int OrderId, string courierId)
     {
-        if (string.IsNullOrEmpty(courierId))
-            return NotFound($"courierId with id {courierId} was not found.");
-
-        try
-        {
-            await _serviceManager.orderService.AssignOrderToCourier(OrderId, courierId);
-            return NoContent();
-        }
-
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        await serviceManager.orderService.AssignOrderToCourier(OrderId, courierId);
+        return NoContent();
     }
 }

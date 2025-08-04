@@ -11,6 +11,7 @@ public class WeightSettingController(IServiceManager serviceManager) : Controlle
 {
     [HttpGet]
     [HasPermission(Permissions.ViewSettings)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<WeightSettingDTO>>> GetAllWeightSetting([FromQuery] PaginationParameters pramter)
     {
         var allWeightSetting = await serviceManager.weightSettingService.GetAllWeightSettingAsync(pramter);
@@ -20,50 +21,46 @@ public class WeightSettingController(IServiceManager serviceManager) : Controlle
 
     [HttpGet("{id}")]
     [HasPermission(Permissions.ViewSettings)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<WeightSettingDTO>> GetWeightSetting(int id)
     {
         var WeightSetting = await serviceManager.weightSettingService.GetWeightSettingAsync(id);
+
         return Ok(WeightSetting);
     }
 
 
     [HttpPost]
     [HasPermission(Permissions.AddSettings)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<ActionResult<WeightSettingDTO>> AddWeightSetting(WeightSettingDTO DTO)
     {
-        await serviceManager.weightSettingService.AddAsync(DTO);
-        return Ok();
+        var weightSetting = await serviceManager.weightSettingService.AddAsync(DTO);
+
+        return CreatedAtAction(nameof(GetWeightSetting), new { id = weightSetting.Id }, weightSetting);
     }
 
 
     [HttpPut("{id}")]
     [HasPermission(Permissions.UpdateSettings)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult<WeightSettingDTO>> UpdateWeightSetting(int id, [FromBody] WeightSettingDTO DTO)
     {
-        try
-        {
-            await serviceManager.weightSettingService.UpdateAsync(id, DTO);
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        await serviceManager.weightSettingService.UpdateAsync(id, DTO);
+
+        return NoContent();
     }
 
 
     [HttpDelete("{id}")]
     [HasPermission(Permissions.DeleteSettings)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> DeleteWeightSetting(int id)
     {
-        try
-        {
-            await serviceManager.weightSettingService.DeleteAsync(id);
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        await serviceManager.weightSettingService.DeleteAsync(id);
+
+        return NoContent();
     }
 }

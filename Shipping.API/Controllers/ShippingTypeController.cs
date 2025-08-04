@@ -7,14 +7,13 @@ using Shipping.Domain.Helpers;
 namespace Shipping.API.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-public class ShippingTypeController(IServiceManager _serviceManager) : ControllerBase
+public class ShippingTypeController(IServiceManager serviceManager) : ControllerBase
 {
-
     [HttpGet]
     [HasPermission(Permissions.ViewSettings)]
     public async Task<ActionResult<IEnumerable<ShippingTypeDTO>>> GetAll([FromQuery] PaginationParameters pramter)
     {
-        var shippingtypes = await _serviceManager.shippingTypeService.GetAllShippingTypeAsync(pramter);
+        var shippingtypes = await serviceManager.shippingTypeService.GetAllShippingTypeAsync(pramter);
 
         return Ok(shippingtypes);
     }
@@ -25,45 +24,30 @@ public class ShippingTypeController(IServiceManager _serviceManager) : Controlle
     [HasPermission(Permissions.ViewSettings)]
     public async Task<ActionResult<ShippingTypeDTO>> Get(int id)
     {
-        var shippingtype = await _serviceManager.shippingTypeService.GetShippingTypeAsync(id);
-
-        if (shippingtype is null)
-            return NotFound($"Shipping Type with id {id} was not found.");
-
+        var shippingtype = await serviceManager.shippingTypeService.GetShippingTypeAsync(id);
 
         return Ok(shippingtype);
     }
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [HasPermission(Permissions.AddSettings)]
-    public async Task<ActionResult<ShippingTypeDTO>> Add(ShippingTypeAddDTO dto)
+    public async Task<ActionResult<ShippingTypeDTO>> Add(ShippingTypeAddDTO DTO)
     {
-        if (dto is null)
-            return BadRequest("Invalid ShippingType data");
+        await serviceManager.shippingTypeService.AddAsync(DTO);
 
-        await _serviceManager.shippingTypeService.AddAsync(dto);
-
-        return CreatedAtAction(nameof(Get), new { id = dto.Id }, dto);
+        return CreatedAtAction(nameof(Get), new { id = DTO.Id }, DTO);
     }
 
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [HasPermission(Permissions.UpdateSettings)]
-    public async Task<ActionResult<ShippingTypeDTO>> Update(int id, [FromBody] ShippingTypeUpdateDTO dto)
+    public async Task<ActionResult<ShippingTypeDTO>> Update(int id, [FromBody] ShippingTypeUpdateDTO DTO)
     {
-        try
-        {
-            await _serviceManager.shippingTypeService.UpdateAsync(id, dto);
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        await serviceManager.shippingTypeService.UpdateAsync(id, DTO);
+
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
@@ -72,14 +56,8 @@ public class ShippingTypeController(IServiceManager _serviceManager) : Controlle
     [HasPermission(Permissions.DeleteSettings)]
     public async Task<ActionResult> Delete(int id)
     {
-        try
-        {
-            await _serviceManager.shippingTypeService.DeleteAsync(id);
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        await serviceManager.shippingTypeService.DeleteAsync(id);
+
+        return NoContent();
     }
 }

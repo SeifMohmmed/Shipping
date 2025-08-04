@@ -13,7 +13,8 @@ public class SpecialCourierRegionController(IServiceManager serviceManager) : Co
     [HasPermission(Permissions.ViewRegions)]
     public async Task<ActionResult<IEnumerable<SpecialCourierRegionDTO>>> GetAll([FromQuery] PaginationParameters paramter)
     {
-        var specialCourierRegion = await serviceManager.specialCourierRegionService.GetSpecialCourierRegionsAsync(paramter);
+        var specialCourierRegion =
+            await serviceManager.specialCourierRegionService.GetSpecialCourierRegionsAsync(paramter);
 
         return Ok(specialCourierRegion);
     }
@@ -24,10 +25,8 @@ public class SpecialCourierRegionController(IServiceManager serviceManager) : Co
     [HasPermission(Permissions.ViewRegions)]
     public async Task<ActionResult<SpecialCourierRegionDTO>> GetById(int id)
     {
-        var specialCourierRegion = await serviceManager.specialCourierRegionService.GetSpecialCourierRegionAsync(id);
-
-        if (specialCourierRegion is null)
-            return NotFound($"SpecialCourierRegion with id {id} was not found.");
+        var specialCourierRegion =
+            await serviceManager.specialCourierRegionService.GetSpecialCourierRegionAsync(id);
 
         return Ok(specialCourierRegion);
     }
@@ -38,9 +37,6 @@ public class SpecialCourierRegionController(IServiceManager serviceManager) : Co
     [HasPermission(Permissions.AddRegions)]
     public async Task<ActionResult<SpecialCourierRegionDTO>> Add(SpecialCourierRegionDTO DTO)
     {
-        if (DTO is null)
-            return BadRequest("Invalid SpecialCourierRegion data");
-
         await serviceManager.specialCourierRegionService.AddAsync(DTO);
 
         return CreatedAtAction(nameof(GetById), new { id = DTO.Id }, DTO);
@@ -53,19 +49,9 @@ public class SpecialCourierRegionController(IServiceManager serviceManager) : Co
     [HasPermission(Permissions.UpdateRegions)]
     public async Task<ActionResult<SpecialCourierRegionDTO>> Update(int id, SpecialCourierRegionDTO DTO)
     {
-        if (DTO is null || id != DTO.Id)
-            return BadRequest("Invalid SpecialCourierRegion data");
+        await serviceManager.specialCourierRegionService.UpdateAsync(DTO);
 
-        try
-        {
-            await serviceManager.specialCourierRegionService.UpdateAsync(DTO);
-
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
@@ -74,17 +60,8 @@ public class SpecialCourierRegionController(IServiceManager serviceManager) : Co
     [HasPermission(Permissions.DeleteRegions)]
     public async Task<ActionResult> Delete(int id)
     {
-        try
-        {
-            await serviceManager.specialCourierRegionService.DeleteAsync(id);
+        await serviceManager.specialCourierRegionService.DeleteAsync(id);
 
-            return NoContent();
-        }
-
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-
+        return NoContent();
     }
 }

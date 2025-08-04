@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Shipping.Application.Abstraction;
 using Shipping.Application.Abstraction.Branch.Service;
 using Shipping.Application.Abstraction.CitySettings.Service;
 using Shipping.Application.Abstraction.Courier;
 using Shipping.Application.Abstraction.CourierReport.Service;
-using Shipping.Application.Abstraction.Employee;
-using Shipping.Application.Abstraction.Merchant;
 using Shipping.Application.Abstraction.OrderReport.Service;
 using Shipping.Application.Abstraction.Orders.Service;
+using Shipping.Application.Abstraction.People;
 using Shipping.Application.Abstraction.Product.Service;
 using Shipping.Application.Abstraction.Region;
 using Shipping.Application.Abstraction.ShippingType.Serivce;
@@ -60,22 +60,26 @@ public class ServiceManager : IServiceManager
     private readonly Lazy<IEmployeeService> _employeeService;
     private readonly Lazy<IMerchantService> _merchantService;
 
-    public ServiceManager(IUnitOfWork unitOfWork, IMapper mapper, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+    public ServiceManager(IUnitOfWork unitOfWork,
+        IMapper mapper,
+        UserManager<ApplicationUser> userManager,
+        IHttpContextAccessor httpContextAccessor,
+        ILoggerFactory loggerFactory)
     {
-        _productService = new Lazy<IProductService>(() => new ProductService(unitOfWork, mapper));
-        _regionService = new Lazy<IRegionService>(() => new RegionService(unitOfWork, mapper));
-        _weightSettingService = new Lazy<IWeightSettingService>(() => new WeightSettingService(unitOfWork, mapper));
-        _courierReportService = new Lazy<ICourierReportService>(() => new CourierReportService(unitOfWork, mapper));
-        _shippingTypeService = new Lazy<IShippingTypeService>(() => new ShippingTypeService(unitOfWork, mapper));
-        _orderService = new Lazy<IOrderService>(() => new OrderService(unitOfWork, mapper, userManager, httpContextAccessor));
-        _branchService = new Lazy<IBranchService>(() => new BranchService(unitOfWork, mapper));
-        _specialCityCostService = new Lazy<ISpecialCityCostService>(() => new SpecialCityCostService(unitOfWork, mapper));
-        _citySettingService = new Lazy<ICitySettingService>(() => new CitySettingService(unitOfWork, mapper));
-        _specialCourierRegionService = new Lazy<ISpecialCourierRegionService>(() => new SpecialCourierRegionService(unitOfWork, mapper));
-        _orderReportService = new Lazy<IOrderReportService>(() => new OrderReportService(unitOfWork, mapper, userManager));
-        _courierService = new Lazy<ICourierService>(() => new CourierService(unitOfWork, userManager, mapper));
-        _employeeService = new Lazy<IEmployeeService>(() => new EmployeeService(unitOfWork, mapper));
-        _merchantService = new Lazy<IMerchantService>(() => new MerchantService(unitOfWork, mapper));
+        _productService = new Lazy<IProductService>(() => new ProductService(loggerFactory.CreateLogger<ProductService>(), unitOfWork, mapper));
+        _regionService = new Lazy<IRegionService>(() => new RegionService(loggerFactory.CreateLogger<RegionService>(), unitOfWork, mapper));
+        _weightSettingService = new Lazy<IWeightSettingService>(() => new WeightSettingService(loggerFactory.CreateLogger<WeightSettingService>(), unitOfWork, mapper));
+        _courierReportService = new Lazy<ICourierReportService>(() => new CourierReportService(loggerFactory.CreateLogger<CourierReportService>(), unitOfWork, mapper));
+        _shippingTypeService = new Lazy<IShippingTypeService>(() => new ShippingTypeService(loggerFactory.CreateLogger<ShippingTypeService>(), unitOfWork, mapper));
+        _orderService = new Lazy<IOrderService>(() => new OrderService(loggerFactory.CreateLogger<OrderService>(), unitOfWork, mapper, userManager, httpContextAccessor));
+        _branchService = new Lazy<IBranchService>(() => new BranchService(loggerFactory.CreateLogger<BranchService>(), unitOfWork, mapper));
+        _specialCityCostService = new Lazy<ISpecialCityCostService>(() => new SpecialCityCostService(loggerFactory.CreateLogger<SpecialCityCostService>(), unitOfWork, mapper));
+        _citySettingService = new Lazy<ICitySettingService>(() => new CitySettingService(loggerFactory.CreateLogger<CitySettingService>(), unitOfWork, mapper)); ;
+        _specialCourierRegionService = new Lazy<ISpecialCourierRegionService>(() => new SpecialCourierRegionService(loggerFactory.CreateLogger<SpecialCourierRegionService>(), unitOfWork, mapper));
+        _orderReportService = new Lazy<IOrderReportService>(() => new OrderReportService(loggerFactory.CreateLogger<OrderReportService>(), unitOfWork, mapper, userManager));
+        _courierService = new Lazy<ICourierService>(() => new CourierService(loggerFactory.CreateLogger<CourierService>(), unitOfWork, userManager, mapper));
+        _employeeService = new Lazy<IEmployeeService>(() => new EmployeeService(loggerFactory.CreateLogger<EmployeeService>(), unitOfWork, mapper));
+        _merchantService = new Lazy<IMerchantService>(() => new MerchantService(loggerFactory.CreateLogger<MerchantService>(), unitOfWork, mapper));
     }
 
     // Properties to access the services

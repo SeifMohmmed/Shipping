@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using Shipping.Application.Abstraction.Product.DTOs;
 using Shipping.Application.Abstraction.Product.Service;
 using Shipping.Domain.Entities;
@@ -6,60 +7,81 @@ using Shipping.Domain.Helpers;
 using Shipping.Domain.Repositories;
 
 namespace Shipping.Application.Services.ProductServices;
-public class ProductService(IUnitOfWork _unitOfWork,
-    IMapper _mapper) : IProductService
+public class ProductService(ILogger<ProductService> logger,
+    IUnitOfWork unitOfWork,
+    IMapper mapper) : IProductService
 {
     //Get All Products
     public async Task<IEnumerable<ProductDTO>> GetProductsAsync(PaginationParameters pramter)
-    => _mapper.Map<IEnumerable<ProductDTO>>(await _unitOfWork.GetRepository<Product, int>().GetAllAsync(pramter));
+    {
+        logger.LogInformation("Retrieving all products with pagination: {@PaginationParameters}", pramter);
+
+        var products = await unitOfWork.GetRepository<Product, int>().GetAllAsync(pramter);
+
+        return mapper.Map<IEnumerable<ProductDTO>>(products);
+    }
 
     // Get Product by Id 
     public async Task<ProductDTO> GetProductAsync(int id)
-    => _mapper.Map<ProductDTO>(await _unitOfWork.GetRepository<Product, int>().GetByIdAsync(id));
+    {
+        logger.LogInformation("Retrieving product with ID: {ProductId}", id);
 
+        var product = await unitOfWork.GetRepository<Product, int>().GetByIdAsync(id);
+
+        if (product is null)
+            throw new NotFoundException(nameof(Product), id.ToString());
+
+        return mapper.Map<ProductDTO>(product);
+    }
 
     // Add Product  
     public async Task<ProductDTO> AddAsync(ProductDTO DTO)
     {
-        var product = _mapper.Map<Product>(DTO);
+        logger.LogInformation("Adding new product: {@ProductDTO}", DTO);
 
-        await _unitOfWork.GetRepository<Product, int>().AddAsync(product);
+        var product = mapper.Map<Product>(DTO);
 
-        await _unitOfWork.CompleteAsync();
+        await unitOfWork.GetRepository<Product, int>().AddAsync(product);
 
-        return _mapper.Map<ProductDTO>(product);
+        await unitOfWork.CompleteAsync();
+
+        return mapper.Map<ProductDTO>(product);
     }
 
 
     //Update Proudct
     public async Task UpdateAsync(int id, UpdateProductDTO DTO)
     {
-        var productRepo = _unitOfWork.GetRepository<Product, int>();
+        logger.LogInformation("Updating product with ID: {ProductId} using data: {@UpdateProductDTO}", id, DTO);
+
+        var productRepo = unitOfWork.GetRepository<Product, int>();
 
         var existingProduct = await productRepo.GetByIdAsync(id);
 
         if (existingProduct is null)
-            throw new KeyNotFoundException($"Product with ID {id} not found.");
+            throw new NotFoundException(nameof(Product), id.ToString());
 
-        _mapper.Map(DTO, existingProduct);
+        mapper.Map(DTO, existingProduct);
 
         productRepo.UpdateAsync(existingProduct);
 
-        await _unitOfWork.CompleteAsync();
+        await unitOfWork.CompleteAsync();
     }
 
     // Delete Product  
     public async Task DeleteAsync(int id)
     {
-        var productRepo = _unitOfWork.GetRepository<Product, int>();
+        logger.LogInformation("Attempting to delete product with ID: {ProductId}", id);
+
+        var productRepo = unitOfWork.GetRepository<Product, int>();
 
         var existingProduct = await productRepo.GetByIdAsync(id);
 
         if (existingProduct is null)
-            throw new KeyNotFoundException($"Product with ID {id} not found.");
+            throw new NotFoundException(nameof(Product), id.ToString());
 
         await productRepo.DeleteAsync(id);
 
-        await _unitOfWork.CompleteAsync();
+        await unitOfWork.CompleteAsync();
     }
 }

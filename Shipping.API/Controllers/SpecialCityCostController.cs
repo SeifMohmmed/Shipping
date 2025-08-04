@@ -27,12 +27,8 @@ public class SpecialCityCostController(IServiceManager serviceManager) : Control
     {
         var speicalCity = await serviceManager.specialCityCostService.GetSpecialCityCostAsync(id);
 
-        if (speicalCity is null)
-            return NotFound($"SpeicalCity with id {id} was not found.");
-
         return Ok(speicalCity);
     }
-
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
@@ -52,17 +48,9 @@ public class SpecialCityCostController(IServiceManager serviceManager) : Control
     [HasPermission(Permissions.UpdateCities)]
     public async Task<ActionResult<SpecialCityCost>> Update(int id, SpecialCityUpdateDTO DTO)
     {
-        try
-        {
-            await serviceManager.specialCityCostService.UpdateAsync(id, DTO);
+        await serviceManager.specialCityCostService.UpdateAsync(id, DTO);
 
-            return NoContent();
-        }
-
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
@@ -71,17 +59,9 @@ public class SpecialCityCostController(IServiceManager serviceManager) : Control
     [HasPermission(Permissions.DeleteCities)]
     public async Task<ActionResult<SpecialCityCost>> Delete(int id)
     {
-        try
-        {
-            await serviceManager.specialCityCostService.DeleteAsync(id);
+        await serviceManager.specialCityCostService.DeleteAsync(id);
 
-            return NoContent();
-        }
-
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        return NoContent();
     }
 
 }

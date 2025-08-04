@@ -20,13 +20,11 @@ public class RegionController(IServiceManager serviceManager) : ControllerBase
 
     [HttpGet("{id}")]
     [HasPermission(Permissions.ViewRegions)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<RegionDTO>> GetById(int id)
     {
         var region = await serviceManager.regionService.GetRegionAsync(id);
-        if (region is null)
-            return NotFound($"Region with id {id} was not found.");
 
         return Ok(region);
     }
@@ -42,23 +40,18 @@ public class RegionController(IServiceManager serviceManager) : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = region.Id }, region);
     }
 
+
     [HttpPut("{id}")]
     [HasPermission(Permissions.UpdateRegions)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<RegionDTO>> Update(int id, [FromBody] RegionDTO DTO)
     {
-        try
-        {
-            await serviceManager.regionService.UpdateAsync(id, DTO);
-            return NoContent();
-        }
+        await serviceManager.regionService.UpdateAsync(id, DTO);
 
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        return NoContent();
     }
+
 
     [HttpDelete("{id}")]
     [HasPermission(Permissions.DeleteRegions)]
@@ -66,15 +59,9 @@ public class RegionController(IServiceManager serviceManager) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> DeletRegion(int id)
     {
-        try
-        {
-            await serviceManager.regionService.DeleteAsync(id);
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        await serviceManager.regionService.DeleteAsync(id);
+
+        return NoContent();
     }
 
 }

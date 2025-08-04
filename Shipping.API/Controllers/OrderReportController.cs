@@ -20,7 +20,6 @@ public class OrderReportController(IServiceManager serviceManager) : ControllerB
     }
 
 
-
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -29,11 +28,9 @@ public class OrderReportController(IServiceManager serviceManager) : ControllerB
     {
         var OrderReport = await serviceManager.orderReportService.GetOrderReportAsync(id);
 
-        if (OrderReport is null)
-            return NotFound($"Order Report with id {id} was not found.");
-
         return Ok(OrderReport);
     }
+
 
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -42,16 +39,10 @@ public class OrderReportController(IServiceManager serviceManager) : ControllerB
     [HasPermission(Permissions.UpdateOrderReports)]
     public async Task<ActionResult> Update(int id, [FromBody] OrderReportDTO DTO)
     {
-        try
-        {
-            await serviceManager.orderReportService.UpdateAsync(id, DTO);
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        await serviceManager.orderReportService.UpdateAsync(id, DTO);
+        return NoContent();
     }
+
 
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -59,14 +50,7 @@ public class OrderReportController(IServiceManager serviceManager) : ControllerB
     [HasPermission(Permissions.DeleteOrderReports)]
     public async Task<ActionResult> Delete(int id)
     {
-        try
-        {
-            await serviceManager.orderReportService.DeleteAsync(id);
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        await serviceManager.orderReportService.DeleteAsync(id);
+        return NoContent();
     }
 }

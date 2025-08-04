@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Shipping.Application.Abstraction.OrderReport.DTO;
 using Shipping.Application.Abstraction.Orders.DTO;
 using Shipping.Application.Abstraction.Orders.Service;
@@ -11,16 +12,19 @@ using Shipping.Domain.Helpers;
 using Shipping.Domain.Repositories;
 
 namespace Shipping.Application.Services.OrderSerivces;
-public class OrderService(IUnitOfWork _unitOfWork,
-    IMapper _mapper,
-    UserManager<ApplicationUser> _userManager,
-    IHttpContextAccessor _httpContextAccessor) : IOrderService
+public class OrderService(ILogger<OrderService> logger,
+    IUnitOfWork unitOfWork,
+    IMapper mapper,
+    UserManager<ApplicationUser> userManager,
+    IHttpContextAccessor httpContextAccessor) : IOrderService
 {
     // Get all orders
     public async Task<IEnumerable<OrderWithProductsDTO>> GetOrdersAsync(PaginationParameters pramter)
     {
+        logger.LogInformation("Fetching orders with pagination parameters: PageNumber {PageNumber}, PageSize {PageSize}", pramter.PageNumber, pramter.PageSize);
+
         var orders =
-            await _unitOfWork.GetOrderRepository().GetAllAsync(pramter, p => p
+            await unitOfWork.GetOrderRepository().GetAllAsync(pramter, p => p
             .Include(o => o.Branch)
             .Include(o => o.Region)
             .Include(o => o.CitySetting)
@@ -35,29 +39,30 @@ public class OrderService(IUnitOfWork _unitOfWork,
     // Get order by id
     public async Task<OrderWithProductsDTO> GetOrderAsync(int id)
     {
-        var findOrder = await _unitOfWork.GetOrderRepository().GetByIdAsync(id,
+        logger.LogInformation("Fetching order with ID {OrderId}", id);
+
+        var findOrder = await unitOfWork.GetOrderRepository().GetByIdAsync(id,
             include: p => p
             .Include(o => o.Branch)
             .Include(o => o.Region)
             .Include(o => o.CitySetting)
             .Include(o => o.Products));
 
-        if (findOrder is null || findOrder.IsDeleted)
-            return null;
+        if (findOrder is null)
+            throw new NotFoundException(nameof(Order), id.ToString());
 
-        var orderDTO = _mapper.Map<OrderWithProductsDTO>(findOrder);
+        var ordersDTO = await GetMerchantName(new[] { findOrder });
 
-        var merchantName = await _userManager.FindByIdAsync(orderDTO.MerchantName);
-        orderDTO.MerchantName = merchantName!.FullName;
-
-        return orderDTO;
+        return ordersDTO.First();
     }
 
 
     //  Get all waiting orders
     public async Task<IEnumerable<OrderWithProductsDTO>> GetAllWatingOrder(PaginationParameters pramter)
     {
-        var orders = await _unitOfWork.GetOrderRepository().GetAllWatingOrder(pramter);
+        logger.LogInformation("Fetching waiting orders with pagination parameters: PageNumber {PageNumber}, PageSize {PageSize}", pramter.PageNumber, pramter.PageSize);
+
+        var orders = await unitOfWork.GetOrderRepository().GetAllWatingOrder(pramter);
 
         var waitngOrderDTO = await GetMerchantName(orders);
 
@@ -68,7 +73,9 @@ public class OrderService(IUnitOfWork _unitOfWork,
     // Get all orders by status
     public async Task<IEnumerable<OrderWithProductsDTO>> GetOrdersByStatus(OrderStatus status, PaginationParameters pramter)
     {
-        var orders = await _unitOfWork.GetOrderRepository().GetOrdersByStatus(status, pramter);
+        logger.LogInformation("Fetching orders with status {Status} and pagination: PageNumber {PageNumber}, PageSize {PageSize}", status, pramter.PageNumber, pramter.PageSize);
+
+        var orders = await unitOfWork.GetOrderRepository().GetOrdersByStatus(status, pramter);
 
         var orderDTO = await GetMerchantName(orders);
 
@@ -79,53 +86,87 @@ public class OrderService(IUnitOfWork _unitOfWork,
     // Add new order And Calculate Shipping Cost And Create Order Report
     public async Task<OrderWithProductsDTO> AddAsync(AddOrderDTO DTO)
     {
-        DTO.ShippingCost = await CalculateShippingCost(DTO);
+        logger.LogInformation("Adding new order for customer {CustomerName}", DTO.CustomerName);
 
-        var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext!.User);
-
-        if (currentUser is not null && await _userManager.IsInRoleAsync(currentUser, DefaultRole.Merchant))
+        if (string.IsNullOrEmpty(DTO.CustomerName))
         {
-            DTO.status = OrderStatus.WaitingForConfirmation;
-            DTO.MerchantName = currentUser.Id;
-
+            throw new ArgumentException("CustomerName is required");
         }
 
-        else
-        {
-            DTO.status = OrderStatus.Pending;
 
+        using var transaction = await unitOfWork.BeginTransactionAsync();
+
+        try
+        {
+
+            var currentUser = await userManager.GetUserAsync(httpContextAccessor.HttpContext!.User);
+
+            var isMerchant = currentUser is not null
+                && await userManager.IsInRoleAsync(currentUser, DefaultRole.Merchant);
+
+
+            if (currentUser is not null)
+            {
+                logger.LogDebug("Current user is {UserName}, ID: {UserId}", currentUser.UserName, currentUser.Id);
+            }
+            else
+            {
+                logger.LogWarning("No authenticated user found when creating order.");
+            }
+
+            var shippingCost = await CalculateShippingCost(DTO);
+
+
+            var order = mapper.Map<Order>(DTO);
+
+            order.ShippingCost = shippingCost;
+            order.Status = isMerchant ? OrderStatus.WaitingForConfirmation : OrderStatus.Pending;
+            order.MerchantId = isMerchant ? currentUser!.Id : null;
+
+            await unitOfWork.GetOrderRepository().AddAsync(order);
+            await unitOfWork.CompleteAsync(); // Save the Order to get its Id
+
+            logger.LogInformation("Order ID {OrderId} created successfully", order.Id);
+
+
+            //Create the order report When Add New order
+            var orderReportDto = new OrderReportDTO
+            {
+                OrderId = order.Id,
+                ReportDate = DateTime.UtcNow,
+                ReportDetails = $"New order (ID: {order.Id}) was created by" +
+                $" merchant '{currentUser.UserName}' for customer '{DTO.CustomerName}' with status '{DTO.status}' " +
+                $"on {DateTime.UtcNow:yyyy-MM-dd HH:mm} UTC."
+            };
+
+            await unitOfWork.GetOrderReportRepository().AddAsync(mapper.Map<OrderReport>(orderReportDto));
+            await unitOfWork.CompleteAsync(); // Save the OrderReport
+
+            await transaction.CommitAsync();
+
+            logger.LogInformation("Order report created for order ID {OrderId}", order.Id);
+
+
+            return mapper.Map<OrderWithProductsDTO>(order);
         }
 
-        var orderEntity = _mapper.Map<Order>(DTO);
-        await _unitOfWork.GetOrderRepository().AddAsync(orderEntity);
-        await _unitOfWork.CompleteAsync(); // Save the Order to get its Id
 
 
-        //Create the order report When Add New order
-        var orderReportDto = new OrderReportDTO
+        catch (Exception ex)
         {
-            OrderId = orderEntity.Id,
-            ReportDate = DateTime.UtcNow,
-            //ReportDetails = $"New order (ID: {orderEntity.Id}) was created by merchant '{currentUser.UserName}' for customer '{DTO.CustomerName}' with status '{DTO.status}' on {DateTime.UtcNow:yyyy-MM-dd HH:mm} UTC."
-        };
-
-        await _unitOfWork.GetOrderReportRepository().AddAsync(_mapper.Map<OrderReport>(orderReportDto));
-        await _unitOfWork.CompleteAsync(); // Save the OrderReport
-
-        return _mapper.Map<OrderWithProductsDTO>(orderEntity);
-
+            await transaction.RollbackAsync();
+            logger.LogError(ex, "Failed to add order for customer {CustomerName}", DTO.CustomerName);
+            throw;
+        }
     }
 
 
     //Update Order
     public async Task UpdateAsync(int id, UpdateOrderDTO DTO)
     {
-        if (DTO.Id != 0 && DTO.Id != id)
-        {
-            throw new ArgumentException("The Id in the DTO does not match the provided Id.");
-        }
+        logger.LogInformation("Updating order with ID {OrderId}", id);
 
-        var orderRepo = _unitOfWork.GetOrderRepository();
+        IOrderRepository? orderRepo = unitOfWork.GetOrderRepository();
 
         var existingOrder = await orderRepo.GetByIdAsync(id,
             include: p => p
@@ -135,52 +176,56 @@ public class OrderService(IUnitOfWork _unitOfWork,
             .Include(o => o.Products));
 
         if (existingOrder is null)
-            throw new KeyNotFoundException($"Order with ID {id} not found.");
+            throw new NotFoundException(nameof(Order), id.ToString());
 
-        _mapper.Map(DTO, existingOrder);
+        mapper.Map(DTO, existingOrder);
 
 
         orderRepo.UpdateAsync(existingOrder);
-        await _unitOfWork.CompleteAsync();
+        await unitOfWork.CompleteAsync();
     }
 
 
     //Delete Order
     public async Task DeleteAsync(int id)
     {
-        var orderRepo = _unitOfWork.GetOrderRepository();
+        logger.LogInformation("Attempting to delete order with ID {OrderId}", id);
+
+        var orderRepo = unitOfWork.GetOrderRepository();
 
         var existingOrder = await orderRepo.GetByIdAsync(id);
 
         if (existingOrder is null)
-            throw new KeyNotFoundException($"Order with ID {id} not found.");
+            throw new NotFoundException(nameof(Order), id.ToString());
 
         await orderRepo.DeleteAsync(id);
-        await _unitOfWork.CompleteAsync();
+        await unitOfWork.CompleteAsync();
     }
 
 
     // Assign order to courier
     public async Task AssignOrderToCourier(int OrderId, string courierId)
     {
+        logger.LogInformation("Assigning order {OrderId} to courier {CourierId}", OrderId, courierId);
+
         if (string.IsNullOrEmpty(courierId))
             throw new ArgumentException("CourierId cannot be null or empty.");
 
-        var order = await _unitOfWork.GetOrderRepository().GetByIdAsync(OrderId);
+        var order = await unitOfWork.GetOrderRepository().GetByIdAsync(OrderId);
 
         if (order is null)
-            throw new KeyNotFoundException("Order not found.");
+            throw new NotFoundException(nameof(Order), OrderId.ToString());
 
         order!.CourierId = courierId;
 
-        var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext!.User);
+        var currentUser = await userManager.GetUserAsync(httpContextAccessor.HttpContext!.User);
 
         order!.EmployeeId = currentUser!.Id;
         order.Status = OrderStatus.DeliveredToCourier;
 
-        _unitOfWork.GetOrderRepository().UpdateAsync(order);
+        unitOfWork.GetOrderRepository().UpdateAsync(order);
 
-        await _unitOfWork.CompleteAsync();
+        await unitOfWork.CompleteAsync();
 
     }
 
@@ -188,13 +233,15 @@ public class OrderService(IUnitOfWork _unitOfWork,
     // Change order status
     public async Task ChangeOrderStatus(int id, OrderStatus orderStatus)
     {
-        var order = await _unitOfWork.GetOrderRepository().GetByIdAsync(id);
+        logger.LogInformation("Changing status of order {OrderId} to {Status}", id, orderStatus);
+
+        var order = await unitOfWork.GetOrderRepository().GetByIdAsync(id);
 
         order!.Status = orderStatus;
 
-        _unitOfWork.GetOrderRepository().UpdateAsync(order);
+        unitOfWork.GetOrderRepository().UpdateAsync(order);
 
-        await _unitOfWork.CompleteAsync();
+        await unitOfWork.CompleteAsync();
     }
 
 
@@ -215,12 +262,23 @@ public class OrderService(IUnitOfWork _unitOfWork,
     // Method to get the merchant name for each order
     private async Task<IEnumerable<OrderWithProductsDTO>> GetMerchantName(IEnumerable<Order> orders)
     {
-        var ordersDTO = _mapper.Map<IEnumerable<OrderWithProductsDTO>>(orders);
+        logger.LogInformation("Fetching merchant names for {OrderCount} orders", orders.Count());
+
+        var ordersDTO = mapper.Map<IEnumerable<OrderWithProductsDTO>>(orders);
+
+        var merchantIds = ordersDTO.Select(o => o.MerchantName).Distinct().ToList();
+
+        var merchants = await userManager.Users
+        .Where(u => merchantIds.Contains(u.Id))
+        .ToDictionaryAsync(u => u.Id, u => u.FullName);
+
         foreach (var order in ordersDTO)
         {
-            var MerchantName = await _userManager.FindByIdAsync(order.MerchantName);
-            order.MerchantName = MerchantName?.FullName ?? "اسم التاجر غير متاح";
+            order.MerchantName = merchants.TryGetValue(order.MerchantName, out var fullName)
+                        ? fullName
+                        : "اسم التاجر غير متاح";
         }
+
         return ordersDTO;
     }
 
@@ -231,16 +289,16 @@ public class OrderService(IUnitOfWork _unitOfWork,
         decimal totalWeight = DTO.TotalWeight;
         bool isOutOfCity = DTO.IsOutOfCityShipping;
 
-        var city = await _unitOfWork.GetRepository<CitySetting, int>().GetByIdAsync(DTO.City)
-            ?? throw new KeyNotFoundException($"City with ID {DTO.City} not found.");
+        var city = await unitOfWork.GetRepository<CitySetting, int>().GetByIdAsync(DTO.City)
+            ?? throw new NotFoundException(nameof(CitySetting), DTO.City.ToString());
 
-        var weightSetting = (await _unitOfWork.GetWeightSettingRepository().GetAllWeightSetting()).FirstOrDefault()
+        var weightSetting = (await unitOfWork.GetWeightSettingRepository().GetAllWeightSetting()).FirstOrDefault()
             ?? throw new Exception("Weight settings not configured.");
 
         decimal maxWeight = weightSetting.MaxWeight;
         decimal costPerKg = weightSetting.CostPerKg;
 
-        var specialCityCost = await _unitOfWork.GetSpecialCityCostRepository()
+        var specialCityCost = await unitOfWork.GetSpecialCityCostRepository()
             .GetCityCostByMarchantId(DTO.MerchantName, DTO.City);
 
         decimal baseCost = specialCityCost?.Price ?? city.StandardShippingCost;
@@ -259,8 +317,8 @@ public class OrderService(IUnitOfWork _unitOfWork,
                 shippingCost += baseCost * 0.1m;
         }
 
-        var shippingType = await _unitOfWork.GetRepository<ShippingType, int>().GetByIdAsync(DTO.ShippingId)
-            ?? throw new KeyNotFoundException($"ShippingType with ID {DTO.ShippingId} not found.");
+        var shippingType = await unitOfWork.GetRepository<ShippingType, int>().GetByIdAsync(DTO.ShippingId)
+            ?? throw new NotFoundException(nameof(ShippingType), DTO.City.ToString());
 
         shippingCost += shippingType.BaseCost;
 
