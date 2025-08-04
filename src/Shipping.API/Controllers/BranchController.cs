@@ -41,7 +41,6 @@ public class BranchController(IServiceManager serviceManager) : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HasPermission(Permissions.UpdateBranches)]
