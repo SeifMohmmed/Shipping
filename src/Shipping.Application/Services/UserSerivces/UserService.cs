@@ -21,7 +21,11 @@ public class UserService(ILogger<UserService> logger,
     {
         logger.LogInformation("Retrieving account profile for user ID: {UserId}", userId);
 
-        var accountDetails = await userManager.Users.FirstAsync(u => u.Id == userId);
+        var accountDetails = await userManager.Users
+            .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+
+        if (accountDetails is null)
+            return null;
 
         return mapper.Map<AccountProfileDTO>(accountDetails);
     }
