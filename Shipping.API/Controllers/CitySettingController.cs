@@ -26,9 +26,6 @@ public class CitySettingController(IServiceManager serviceManager) : ControllerB
     {
         var citySettings = await serviceManager.citySettingService.GetCitySettingAsync(id);
 
-        if (citySettings is null)
-            return NotFound($"citySetting with id {id} was not found.");
-
         return Ok(citySettings);
     }
 
@@ -38,17 +35,9 @@ public class CitySettingController(IServiceManager serviceManager) : ControllerB
     [HasPermission(Permissions.ViewCities)]
     public async Task<ActionResult<IEnumerable<CitySettingDTO>>> GetCityByRegion(int regionId)
     {
-        try
-        {
-            var result = await serviceManager.citySettingService.GetCitiesByRegionId(regionId);
+        var result = await serviceManager.citySettingService.GetCitiesByRegionId(regionId);
 
-            return Ok(result);
-        }
-
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        return Ok(result);
     }
 
     [HttpPost]
@@ -57,35 +46,20 @@ public class CitySettingController(IServiceManager serviceManager) : ControllerB
     [HasPermission(Permissions.AddCities)]
     public async Task<ActionResult<CitySettingToAddDTO>> Add(CitySettingToAddDTO DTO)
     {
-        if (DTO is null)
-            return BadRequest("Invalid CitySetting data");
-
         var createdCitySetting = await serviceManager.citySettingService.AddAsync(DTO);
 
         return CreatedAtAction(nameof(GetById), new { id = createdCitySetting.Id }, DTO);
     }
 
     [HttpPut("{id}")]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HasPermission(Permissions.UpdateCities)]
     public async Task<IActionResult> Update(int id, CitySettingToUpdateDTO DTO)
     {
-        if (DTO is null)
-            return BadRequest("Invalid CitySetting data");
+        await serviceManager.citySettingService.UpdateAsync(id, DTO);
 
-        try
-        {
-            await serviceManager.citySettingService.UpdateAsync(id, DTO);
-
-            return NoContent();
-        }
-
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
@@ -94,17 +68,9 @@ public class CitySettingController(IServiceManager serviceManager) : ControllerB
     [HasPermission(Permissions.DeleteCities)]
     public async Task<ActionResult> Delete(int id)
     {
-        try
-        {
-            await serviceManager.citySettingService.DeleteAsync(id);
+        await serviceManager.citySettingService.DeleteAsync(id);
 
-            return NoContent();
-        }
-
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        return NoContent();
     }
 
 

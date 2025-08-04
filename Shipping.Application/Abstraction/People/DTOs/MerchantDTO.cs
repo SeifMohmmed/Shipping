@@ -1,4 +1,4 @@
-﻿namespace Shipping.Application.Abstraction.Merchant.DTO;
+﻿namespace Shipping.Application.Abstraction.People.DTOs;
 public class MerchantDTO
 {
     public string Id { get; set; }

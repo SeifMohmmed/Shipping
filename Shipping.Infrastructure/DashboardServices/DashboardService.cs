@@ -1,38 +1,41 @@
-﻿using Shipping.Application.Abstraction.Dashboard;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Shipping.Application.Abstraction.Dashboard;
 using Shipping.Application.Abstraction.Dashboard.DTO;
 using Shipping.Domain.Enums;
 using Shipping.Infrastructure.Persistence;
 
 namespace Shipping.Infrastructure.DashboardServices;
-internal class DashboardService(ApplicationDbContext context) : IDashboardService
+internal class DashboardService(ILogger<DashboardService> logger,
+    ApplicationDbContext context) : IDashboardService
 {
     public async Task<MerchantDashboardDTO> GetDashboardDataForMerchantAsync()
     {
-        int TotalDelivered = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.Delivered));
-        int TotalPending = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.Pending));
-        int TotalAwaitingConfirmation = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.WaitingForConfirmation));
-        int TotalCancelledByTheRecipient = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.CanceledByRecipient));
-        int TotalRejectedWithPayed = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.DeclinedWithFullPayment));
-        int TotalPostponed = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.InProgress));
-        int TotalDeliveredToTheRepresentative = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.DeliveredToCourier));
-        int TotalRejectedWithPartialPayment = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.DeclinedWithPartialPayment));
-        int TotalRejectedAndAotPaid = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.Declined));
-        int TotalPartiallyDelivered = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.PartialDelivery));
-        int TotalCantAccess = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.UnreachableCustomer));
+        logger.LogInformation("Starting to fetch merchant dashboard data.");
+
+        var statusCounts = await context.Orders.GroupBy(o => o.Status)
+            .Select(g => new { Status = g.Key, Count = g.Count() })
+            .ToListAsync();
+
+        logger.LogInformation("Fetched order counts grouped by status: {@StatusCounts}", statusCounts);
+
+        int GetCount(OrderStatus status) =>
+            statusCounts.FirstOrDefault(s => s.Status == status)?.Count ?? 0;
+
 
         var dashboardData = new MerchantDashboardDTO
         {
-            TotalDelivered = TotalDelivered,
-            TotalPending = TotalPending,
-            TotalCancelledByTheRecipient = TotalCancelledByTheRecipient,
-            TotalAwaitingConfirmation = TotalAwaitingConfirmation,
-            TotalRejectedWithPayed = TotalRejectedWithPayed,
-            TotalPostponed = TotalPostponed,
-            TotalDeliveredToTheRepresentative = TotalDeliveredToTheRepresentative,
-            TotalRejectedWithPartialPayment = TotalRejectedWithPartialPayment,
-            TotalRejectedAndAotPaid = TotalRejectedAndAotPaid,
-            TotalPartiallyDelivered = TotalPartiallyDelivered,
-            TotalCantAccess = TotalCantAccess
+            TotalDelivered = GetCount(OrderStatus.Delivered),
+            TotalPending = GetCount(OrderStatus.Pending),
+            TotalAwaitingConfirmation = GetCount(OrderStatus.WaitingForConfirmation),
+            TotalCancelledByTheRecipient = GetCount(OrderStatus.CanceledByRecipient),
+            TotalRejectedWithPayed = GetCount(OrderStatus.DeclinedWithFullPayment),
+            TotalPostponed = GetCount(OrderStatus.InProgress),
+            TotalDeliveredToTheRepresentative = GetCount(OrderStatus.DeliveredToCourier),
+            TotalRejectedWithPartialPayment = GetCount(OrderStatus.DeclinedWithPartialPayment),
+            TotalRejectedAndAotPaid = GetCount(OrderStatus.Declined),
+            TotalPartiallyDelivered = GetCount(OrderStatus.PartialDelivery),
+            TotalCantAccess = GetCount(OrderStatus.UnreachableCustomer)
         };
 
         return dashboardData;
@@ -40,31 +43,32 @@ internal class DashboardService(ApplicationDbContext context) : IDashboardServic
 
     public async Task<EmpDashboardDTO> GetDashboardOfEmployeeAsync()
     {
-        int TotalDelivered = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.Delivered));
-        int TotalPending = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.Pending));
-        int TotalAwaitingConfirmation = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.WaitingForConfirmation));
-        int TotalInProcessing = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.InProgress));
-        int TotalRejected = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.Declined));
-        int TotalReturned = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.CanceledByRecipient));
-        int TotalCancelled = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.UnreachableCustomer));
-        int TotalShipped = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.DeliveredToCourier));
-        int TotalReceived = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.PartialDelivery));
-        int TotalPayed = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.DeclinedWithFullPayment));
-        int TotalUpdated = await Task.Run(() => context.Orders.Count(x => x.Status == OrderStatus.DeclinedWithPartialPayment));
+        logger.LogInformation("Starting to fetch employee dashboard data.");
+
+        var statusCounts = await context.Orders
+            .GroupBy(o => o.Status)
+            .Select(g => new { Status = g.Key, Count = g.Count() })
+            .ToListAsync();
+
+        logger.LogInformation("Fetched order counts grouped by status: {@StatusCounts}", statusCounts);
+
+        int GetCount(OrderStatus status) =>
+            statusCounts.FirstOrDefault(s => s.Status == status)?.Count ?? 0;
+
 
         var dashboardData = new EmpDashboardDTO
         {
-            TotalDelivered = TotalDelivered,
-            TotalPending = TotalPending,
-            TotalCancelled = TotalCancelled,
-            TotalInProcessing = TotalInProcessing,
-            TotalAwaitingConfirmation = TotalAwaitingConfirmation,
-            TotalRejected = TotalRejected,
-            TotalReceived = TotalReceived,
-            TotalShipped = TotalShipped,
-            TotalReturned = TotalReturned,
-            TotalPayed = TotalPayed,
-            TotalUpdated = TotalUpdated
+            TotalDelivered = GetCount(OrderStatus.Delivered),
+            TotalPending = GetCount(OrderStatus.Pending),
+            TotalAwaitingConfirmation = GetCount(OrderStatus.WaitingForConfirmation),
+            TotalInProcessing = GetCount(OrderStatus.InProgress),
+            TotalRejected = GetCount(OrderStatus.Declined),
+            TotalReturned = GetCount(OrderStatus.CanceledByRecipient),
+            TotalCancelled = GetCount(OrderStatus.UnreachableCustomer),
+            TotalShipped = GetCount(OrderStatus.DeliveredToCourier),
+            TotalReceived = GetCount(OrderStatus.PartialDelivery),
+            TotalPayed = GetCount(OrderStatus.DeclinedWithFullPayment),
+            TotalUpdated = GetCount(OrderStatus.DeclinedWithPartialPayment)
         };
 
         return dashboardData;

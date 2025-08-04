@@ -1,14 +1,20 @@
 ﻿using AutoMapper;
-using Shipping.Application.Abstraction.Merchant;
-using Shipping.Application.Abstraction.Merchant.DTO;
+using Microsoft.Extensions.Logging;
+using Shipping.Application.Abstraction.People;
+using Shipping.Application.Abstraction.People.DTOs;
 using Shipping.Domain.Repositories;
 
 namespace Shipping.Application.Services.MerchantServices;
-internal class MerchantService(IUnitOfWork unitOfWork,
+internal class MerchantService(ILogger<MerchantService> logger,
+    IUnitOfWork unitOfWork,
     IMapper mapper) : IMerchantService
 {
     public async Task<IEnumerable<MerchantDTO>> GetMerchantAsync()
     {
-        return mapper.Map<IEnumerable<MerchantDTO>>(await unitOfWork.GetAllMerchantAsync().GetAllMerchantAsync());
+        logger.LogInformation("Fetching all merchants...");
+
+        var merchants = await unitOfWork.GetAllMerchantAsync().GetAllMerchantAsync();
+
+        return mapper.Map<IEnumerable<MerchantDTO>>(merchants);
     }
 }

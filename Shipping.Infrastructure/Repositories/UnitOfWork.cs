@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Storage;
 using Shipping.Domain.Entities;
 using Shipping.Domain.Repositories;
 using Shipping.Infrastructure.Persistence;
@@ -71,5 +72,10 @@ internal class UnitOfWork(ApplicationDbContext _context,
     public IMerchantRepository GetAllMerchantAsync()
     {
         return (IMerchantRepository)_repositories.GetOrAdd(typeof(ApplicationUser).Name, new MerchantRepository(userManager));
+    }
+
+    public async Task<IDbContextTransaction> BeginTransactionAsync()
+    {
+        return await _context.Database.BeginTransactionAsync();
     }
 }

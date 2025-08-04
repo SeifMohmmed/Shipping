@@ -26,9 +26,6 @@ public class BranchController(IServiceManager serviceManager) : ControllerBase
     {
         var branch = await serviceManager.branchService.GetBranchAsync(id);
 
-        if (branch is null)
-            return NotFound($"Branch with id {id} was not found.");
-
         return Ok(branch);
     }
 
@@ -41,7 +38,6 @@ public class BranchController(IServiceManager serviceManager) : ControllerBase
         var branch = await serviceManager.branchService.AddAsync(DTO);
 
         return CreatedAtAction(nameof(GetById), new { id = branch.Id }, branch);
-
     }
 
     [HttpPut("{id}")]
@@ -51,18 +47,9 @@ public class BranchController(IServiceManager serviceManager) : ControllerBase
     [HasPermission(Permissions.UpdateBranches)]
     public async Task<ActionResult<BranchDTO>> Update(int id, [FromBody] BranchToUpdateDTO DTO)
     {
-        try
-        {
-            await serviceManager.branchService.UpdateAsync(id, DTO);
+        await serviceManager.branchService.UpdateAsync(id, DTO);
 
-            return NoContent();
-        }
-
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
@@ -71,16 +58,8 @@ public class BranchController(IServiceManager serviceManager) : ControllerBase
     [HasPermission(Permissions.DeleteBranches)]
     public async Task<ActionResult> Delete(int id)
     {
-        try
-        {
-            await serviceManager.branchService.DeleteAsync(id);
+        await serviceManager.branchService.DeleteAsync(id);
 
-            return NoContent();
-        }
-
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        return NoContent();
     }
 }

@@ -1,4 +1,5 @@
 using Shipping.API.Extensions;
+using Shipping.API.Middlewares;
 using Shipping.Application.Extentions;
 using Shipping.Domain.Entities;
 using Shipping.Infrastructure.Extentions;
@@ -7,7 +8,7 @@ namespace Shipping.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +24,10 @@ namespace Shipping.API
             //Seeding
             var scoope = app.Services.CreateScope();
             var seeder = scoope.ServiceProvider.GetRequiredService<IShippingSeeder>();
-            seeder.SeedAsync();
+            await seeder.SeedAsync();
+
+            app.UseMiddleware<ErrorHandlingMiddleware>();
+            app.UseMiddleware<RequestTimeLoggingMiddleware>();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

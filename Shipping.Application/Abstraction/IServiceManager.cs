@@ -2,10 +2,9 @@
 using Shipping.Application.Abstraction.CitySettings.Service;
 using Shipping.Application.Abstraction.Courier;
 using Shipping.Application.Abstraction.CourierReport.Service;
-using Shipping.Application.Abstraction.Employee;
-using Shipping.Application.Abstraction.Merchant;
 using Shipping.Application.Abstraction.OrderReport.Service;
 using Shipping.Application.Abstraction.Orders.Service;
+using Shipping.Application.Abstraction.People;
 using Shipping.Application.Abstraction.Product.Service;
 using Shipping.Application.Abstraction.Region;
 using Shipping.Application.Abstraction.ShippingType.Serivce;

@@ -9,9 +9,8 @@ namespace Shipping.API.Controllers;
 [Authorize]
 public class AccountController(IUserService userService) : ControllerBase
 {
-
-    [HttpGet]
     //To retrieve and return the authenticated user’s account profile information
+    [HttpGet]
     public async Task<IActionResult> GetAccountProfile()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

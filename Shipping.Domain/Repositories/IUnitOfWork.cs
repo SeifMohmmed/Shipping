@@ -1,4 +1,6 @@
-﻿namespace Shipping.Domain.Repositories;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+
+namespace Shipping.Domain.Repositories;
 
 // This Is A Unit Of Work Interface That Contains The Repositories
 public interface IUnitOfWork : IAsyncDisposable
@@ -24,4 +26,5 @@ public interface IUnitOfWork : IAsyncDisposable
 
     Task<int> CompleteAsync();
 
+    Task<IDbContextTransaction> BeginTransactionAsync();
 }

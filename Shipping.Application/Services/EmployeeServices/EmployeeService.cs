@@ -1,13 +1,21 @@
 ﻿using AutoMapper;
-using Shipping.Application.Abstraction.Employee;
+using Microsoft.Extensions.Logging;
+using Shipping.Application.Abstraction.People;
 using Shipping.Application.Abstraction.User.DTO;
 using Shipping.Domain.Helpers;
 using Shipping.Domain.Repositories;
 
 namespace Shipping.Application.Services.EmployeeServices;
-internal class EmployeeService(IUnitOfWork unitOfWork, IMapper mapper) : IEmployeeService
+internal class EmployeeService(ILogger<EmployeeService> logger,
+    IUnitOfWork unitOfWork,
+    IMapper mapper) : IEmployeeService
 {
     public async Task<IEnumerable<EmployeeDTO>> GetEmployeesAsync(PaginationParameters pramter)
-    => mapper.Map<IEnumerable<EmployeeDTO>>(await unitOfWork.GetAllEmployeesAsync().GetAllEmployeesAsync(pramter));
+    {
+        logger.LogInformation("Getting all employees with pagination {@Pagination}", pramter);
 
+        var employees = await unitOfWork.GetAllEmployeesAsync().GetAllEmployeesAsync(pramter);
+
+        return mapper.Map<IEnumerable<EmployeeDTO>>(employees);
+    }
 }

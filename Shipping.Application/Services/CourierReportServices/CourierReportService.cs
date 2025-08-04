@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Shipping.Application.Abstraction.CourierReport.DTOs;
 using Shipping.Application.Abstraction.CourierReport.Service;
 using Shipping.Domain.Entities;
@@ -7,19 +8,22 @@ using Shipping.Domain.Helpers;
 using Shipping.Domain.Repositories;
 
 namespace Shipping.Application.Services.CourierReportServices;
-public class CourierReportService(IUnitOfWork _unitOfWork,
-    IMapper _mapper) : ICourierReportService
+public class CourierReportService(ILogger<CourierReportService> logger,
+    IUnitOfWork unitOfWork,
+    IMapper mapper) : ICourierReportService
 {
     // Get All Courier Reports
-    public async Task<IEnumerable<GetAllCourierOrderCountDTO>> GetAllCourierReportAsync(PaginationParameters pramter)
+    public async Task<IEnumerable<GetAllCourierOrderCountDTO>> GetAllCourierReportAsync(PaginationParameters parameter)
     {
-        var courierReports = await _unitOfWork.GetRepository<CourierReport, int>().GetAllAsync(pramter,
+        logger.LogInformation("Fetching all courier reports with pagination: {@Pagination}", parameter);
+
+        var courierReports = await unitOfWork.GetRepository<CourierReport, int>().GetAllAsync(parameter,
             p => p.Include(c => c.Courier));
 
-        if (courierReports is null)
+        if (courierReports is null || !courierReports.Any())
             throw new KeyNotFoundException($"CourierReport not found.");
 
-        var reportDTOs = _mapper.Map<List<CourierReportDTO>>(courierReports);
+        var reportDTOs = mapper.Map<List<CourierReportDTO>>(courierReports);
 
         var grouped = reportDTOs
             .GroupBy(r => r.CourierName)
@@ -35,7 +39,9 @@ public class CourierReportService(IUnitOfWork _unitOfWork,
     // Get Courier Report By Id
     public async Task<CourierReportDTO> GetCourierReportAsync(int id, PaginationParameters parameter)
     {
-        var courierReport = await _unitOfWork.GetRepository<CourierReport, int>().GetByIdAsync(id,
+        logger.LogInformation("Fetching courier report by Id: {ReportId}", id);
+
+        var courierReport = await unitOfWork.GetRepository<CourierReport, int>().GetByIdAsync(id,
             p => p
             .Include(c => c.Courier)
             .Include(c => c.Order)
@@ -44,10 +50,12 @@ public class CourierReportService(IUnitOfWork _unitOfWork,
                 .ThenInclude(c => c.Products));
 
         if (courierReport is null)
-            throw new KeyNotFoundException($"CitySetting with ID {id} not found.");
+            throw new NotFoundException(nameof(CourierReport), id.ToString());
 
-        var reportDTO = _mapper.Map<CourierReportDTO>(courierReport);
-        var user = await _unitOfWork.GetRepository<ApplicationUser, int>().GetAllAsync(parameter);
+        var reportDTO = mapper.Map<CourierReportDTO>(courierReport);
+
+        var user =
+            await unitOfWork.GetRepository<ApplicationUser, int>().GetAllAsync(parameter);
 
         var merchant = user.FirstOrDefault(u => u.Id == reportDTO.MerchantId);
 
