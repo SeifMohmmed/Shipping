@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Shipping.Application.Abstraction.OrderReport.DTO;
 using Shipping.Application.Abstraction.Orders.DTO;
 using Shipping.Application.Abstraction.Orders.Service;
+using Shipping.Domain.Constants;
 using Shipping.Domain.Entities;
 using Shipping.Domain.Enums;
 using Shipping.Domain.Helpers;
@@ -102,7 +103,7 @@ public class OrderService(ILogger<OrderService> logger,
             var currentUser = await userManager.GetUserAsync(httpContextAccessor.HttpContext!.User);
 
             var isMerchant = currentUser is not null
-                && await userManager.IsInRoleAsync(currentUser, DefaultRole.Merchant);
+                && await userManager.IsInRoleAsync(currentUser, UserRole.Merchant);
 
 
             if (currentUser is not null)

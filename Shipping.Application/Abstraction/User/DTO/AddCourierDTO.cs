@@ -1,5 +1,5 @@
-﻿using Shipping.Domain.Enums;
-using Shipping.Domain.Helpers;
+﻿using Shipping.Domain.Constants;
+using Shipping.Domain.Enums;
 using System.Text.Json.Serialization;
 
 namespace Shipping.Application.Abstraction.User.DTO;
@@ -18,7 +18,7 @@ public record AddCourierDTO
     public int BranchId { get; set; }
 
     [JsonIgnore]
-    public string RoleName = DefaultRole.Courier;
+    public string RoleName = UserRole.Courier;
 
     public DeductionTypes DeductionType { get; set; } = DeductionTypes.Fixed;
 

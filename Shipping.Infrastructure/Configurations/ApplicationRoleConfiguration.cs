@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shipping.Domain.Constants;
 using Shipping.Domain.Entities;
 using Shipping.Domain.Helpers;
 
@@ -29,7 +30,7 @@ public class ApplicationRoleConfiguration : IEntityTypeConfiguration<Application
         {
             Id = DefaultRole.MerchantRoleId,
             Name = DefaultRole.Merchant,
-            NormalizedName = DefaultRole.Merchant.ToUpper(),
+            NormalizedName = UserRole.Merchant.ToUpper(),
             ConcurrencyStamp = DefaultRole.MerchantRoleConcurrencyStamp
         });
     }

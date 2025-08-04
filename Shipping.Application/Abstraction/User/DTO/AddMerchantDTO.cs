@@ -1,4 +1,4 @@
-﻿using Shipping.Domain.Helpers;
+﻿using Shipping.Domain.Constants;
 using System.Text.Json.Serialization;
 
 namespace Shipping.Application.Abstraction.User.DTO;
@@ -23,7 +23,7 @@ public record AddMerchantDTO
     public string StoreName { get; set; } = string.Empty;
 
     [JsonIgnore]
-    public string RoleName { get; set; } = DefaultRole.Merchant;
+    public string RoleName { get; set; } = UserRole.Merchant;
 
     public List<SpecialCityCostDT0>? SpecialCityCosts { get; set; } = new();
 
