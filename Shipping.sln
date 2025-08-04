@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shipping.Infrastructure", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shipping.Domain.Tests", "xUnit\Shipping.Domain.Tests\Shipping.Domain.Tests.csproj", "{57FA012C-DB16-DB23-6EC4-6D51CB64BAF0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shipping.API.Tests", "Shipping.API.Tests\Shipping.API.Tests.csproj", "{8309AF77-9B19-44F3-82CD-F7E88E7E6455}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{57FA012C-DB16-DB23-6EC4-6D51CB64BAF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57FA012C-DB16-DB23-6EC4-6D51CB64BAF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57FA012C-DB16-DB23-6EC4-6D51CB64BAF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8309AF77-9B19-44F3-82CD-F7E88E7E6455}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8309AF77-9B19-44F3-82CD-F7E88E7E6455}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8309AF77-9B19-44F3-82CD-F7E88E7E6455}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8309AF77-9B19-44F3-82CD-F7E88E7E6455}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{1AF8EB95-E26C-0181-96CE-C187A8E04450} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{8CA7ED30-3B02-4D35-3106-395E548AECDE} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{57FA012C-DB16-DB23-6EC4-6D51CB64BAF0} = {C5CC6279-335A-4D59-8015-4334DC181378}
+		{8309AF77-9B19-44F3-82CD-F7E88E7E6455} = {C5CC6279-335A-4D59-8015-4334DC181378}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1131390C-C70A-4B10-A06F-E99BB047D13E}
