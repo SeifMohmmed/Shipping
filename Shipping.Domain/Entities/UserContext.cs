@@ -14,7 +14,7 @@ public class UserContext(IHttpContextAccessor httpContextAccessor) : IUserContex
         var user = httpContextAccessor?.HttpContext?.User;
 
         if (user is null)
-            return null;
+            throw new InvalidOperationException("User context is not present");
 
         if (user.Identity is null || !user.Identity.IsAuthenticated)
             return null;

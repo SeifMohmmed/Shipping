@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shipping.Application", "Shi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shipping.Infrastructure", "Shipping.Infrastructure\Shipping.Infrastructure.csproj", "{0C5C33AB-66CC-E8D1-5B23-8D08878AAF04}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shipping.Domain.Tests", "Shipping.Domain.Tests\Shipping.Domain.Tests.csproj", "{EAAC9565-DCCB-46A6-A7B5-FA05A1D053C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{0C5C33AB-66CC-E8D1-5B23-8D08878AAF04}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C5C33AB-66CC-E8D1-5B23-8D08878AAF04}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C5C33AB-66CC-E8D1-5B23-8D08878AAF04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAAC9565-DCCB-46A6-A7B5-FA05A1D053C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAAC9565-DCCB-46A6-A7B5-FA05A1D053C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAAC9565-DCCB-46A6-A7B5-FA05A1D053C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAAC9565-DCCB-46A6-A7B5-FA05A1D053C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

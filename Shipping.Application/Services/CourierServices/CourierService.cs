@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Shipping.Application.Abstraction.Courier;
 using Shipping.Application.Abstraction.Courier.DTO;
+using Shipping.Domain.Constants;
 using Shipping.Domain.Entities;
 using Shipping.Domain.Helpers;
 using Shipping.Domain.Repositories;
@@ -34,7 +35,7 @@ internal class CourierService(ILogger<CourierService> logger,
         if (order is null)
             throw new NotFoundException(nameof(Order), orderId.ToString());
 
-        var Couriers = await userManager.GetUsersInRoleAsync(DefaultRole.Courier);
+        var Couriers = await userManager.GetUsersInRoleAsync(UserRole.Courier);
 
         var couriersInBranch = Couriers.Where(c => c.BranchId == order!.BranchId);
 
@@ -53,7 +54,7 @@ internal class CourierService(ILogger<CourierService> logger,
         if (order is null)
             return Enumerable.Empty<CourierDTO>();
 
-        var couriers = await userManager.GetUsersInRoleAsync(DefaultRole.Courier);
+        var couriers = await userManager.GetUsersInRoleAsync(UserRole.Courier);
 
         var couriersInRegion = couriers.Where(c => c.RegionId == order.RegionId).ToList();
 
