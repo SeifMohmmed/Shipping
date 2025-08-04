@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Shipping.Application.Abstraction;
+using Shipping.Application.Abstraction.Dashboard;
 using Shipping.Application.Abstraction.User;
+using Shipping.Application.DashboardServices;
 using Shipping.Application.Services;
 using Shipping.Application.Services.UserSerivces;
 using Shipping.Domain.Entities;
@@ -17,6 +19,8 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IUserContext, UserContext>();
         services.AddScoped<IUserService, UserService>();
+
+        services.AddScoped<IDashboardService, DashboardService>();
 
         services.AddHttpContextAccessor();
     }

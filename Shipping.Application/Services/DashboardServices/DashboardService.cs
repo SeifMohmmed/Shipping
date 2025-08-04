@@ -1,26 +1,23 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Shipping.Application.Abstraction.Dashboard;
 using Shipping.Application.Abstraction.Dashboard.DTO;
 using Shipping.Domain.Enums;
-using Shipping.Infrastructure.Persistence;
+using Shipping.Domain.Repositories;
 
-namespace Shipping.Infrastructure.DashboardServices;
+namespace Shipping.Application.DashboardServices;
 internal class DashboardService(ILogger<DashboardService> logger,
-    ApplicationDbContext context) : IDashboardService
+    IDashboardRepository dashboardRepository) : IDashboardService
 {
     public async Task<MerchantDashboardDTO> GetDashboardDataForMerchantAsync()
     {
         logger.LogInformation("Starting to fetch merchant dashboard data.");
 
-        var statusCounts = await context.Orders.GroupBy(o => o.Status)
-            .Select(g => new { Status = g.Key, Count = g.Count() })
-            .ToListAsync();
+        var statusCounts = await dashboardRepository.GetOrderStatusCountsAsync();
+
 
         logger.LogInformation("Fetched order counts grouped by status: {@StatusCounts}", statusCounts);
 
-        int GetCount(OrderStatus status) =>
-            statusCounts.FirstOrDefault(s => s.Status == status)?.Count ?? 0;
+        int GetCount(OrderStatus status) => statusCounts.GetValueOrDefault(status, 0);
 
 
         var dashboardData = new MerchantDashboardDTO
@@ -45,15 +42,11 @@ internal class DashboardService(ILogger<DashboardService> logger,
     {
         logger.LogInformation("Starting to fetch employee dashboard data.");
 
-        var statusCounts = await context.Orders
-            .GroupBy(o => o.Status)
-            .Select(g => new { Status = g.Key, Count = g.Count() })
-            .ToListAsync();
+        var statusCounts = await dashboardRepository.GetOrderStatusCountsAsync();
 
         logger.LogInformation("Fetched order counts grouped by status: {@StatusCounts}", statusCounts);
 
-        int GetCount(OrderStatus status) =>
-            statusCounts.FirstOrDefault(s => s.Status == status)?.Count ?? 0;
+        int GetCount(OrderStatus status) => statusCounts.GetValueOrDefault(status, 0);
 
 
         var dashboardData = new EmpDashboardDTO

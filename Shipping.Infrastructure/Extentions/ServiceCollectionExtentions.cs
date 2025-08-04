@@ -1,12 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Shipping.Application.Abstraction.Dashboard;
 using Shipping.Application.Abstraction.Roles;
 using Shipping.Domain.Entities;
 using Shipping.Domain.Helpers;
 using Shipping.Domain.Repositories;
-using Shipping.Infrastructure.DashboardServices;
 using Shipping.Infrastructure.Persistence;
 using Shipping.Infrastructure.Repositories;
 using Shipping.Infrastructure.RoleServices;
@@ -63,7 +61,9 @@ public static class ServiceCollectionExtentions
 
         services.AddScoped<IRoleService, RoleService>();
 
-        services.AddScoped<IDashboardService, DashboardService>();
+        services.AddScoped<IDashboardRepository, DashboardRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
+
         services.AddScoped<IShippingSeeder, ShippingSeeder>();
 
     }
