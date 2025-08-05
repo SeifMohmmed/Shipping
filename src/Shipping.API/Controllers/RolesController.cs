@@ -25,7 +25,7 @@ public class RolesController(IRoleService roleService) : ControllerBase
         var result = await roleService.GetRoleByIdAsync(id, cancellationToken);
 
         if (result is null)
-            return NotFound("Group does not exists");
+            return NotFound("Role does not exists");
 
         return Ok(result);
     }
@@ -38,7 +38,7 @@ public class RolesController(IRoleService roleService) : ControllerBase
     {
         var result = await roleService.CreateRoleAsync(createRoleRequestDTO, cancellationToken);
 
-        if (result.Equals("Group Created Successfully!"))
+        if (result.Equals("Role Added Successfully!"))
             return Ok(result);
 
         return BadRequest(result);
@@ -53,7 +53,7 @@ public class RolesController(IRoleService roleService) : ControllerBase
         var result =
             await roleService.UpdateRoleAsync(id, createRoleRequestDTO, cancellationToken);
 
-        if (result.Equals("Group Updated Successfully!"))
+        if (result.Equals("Role Updated Successfully!"))
             return Ok(result);
 
         return BadRequest(result);
@@ -68,7 +68,7 @@ public class RolesController(IRoleService roleService) : ControllerBase
         var result =
             await roleService.DeleteRoleAsync(id, cancellationToken);
 
-        if (result.Equals("Group Deletd Successfully!"))
+        if (result.Equals("Role Deleted Successfully!"))
             return Ok(result);
 
         return BadRequest(result);

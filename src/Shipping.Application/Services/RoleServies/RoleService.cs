@@ -77,7 +77,7 @@ public class RoleService(ILogger<RoleService> logger,
         var permissionsAdded = await roleRepository.AddPermissionsToRoleAsync(role.Id, createRoleRequestDTO.Permissions, cancellationToken);
 
 
-        return "Group Created Successfully!";
+        return "Role Added Successfully!";
     }
 
     // Update Role (Group)
@@ -114,7 +114,7 @@ public class RoleService(ILogger<RoleService> logger,
             return "Failed To Update Role !";
 
 
-        return "Group Updated Successfully!";
+        return "Role Updated Successfully!";
     }
 
     // Delete Role (Group)
@@ -133,6 +133,6 @@ public class RoleService(ILogger<RoleService> logger,
             return "Failed To Delete Role !";
 
 
-        return "Group Deleted Successfully!";
+        return "Role Deleted Successfully!";
     }
 }
