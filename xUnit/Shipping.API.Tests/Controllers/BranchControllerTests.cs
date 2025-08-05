@@ -2,6 +2,7 @@
 using Moq;
 using Shipping.Application.Abstraction;
 using Shipping.Application.Abstraction.Branch.DTO;
+using Shipping.Application.Abstraction.Branch.Service;
 using Shipping.Domain.Entities;
 using Shipping.Domain.Helpers;
 
@@ -98,6 +99,36 @@ public class BranchControllerTests
         //Assert
         await Assert.ThrowsAsync<NotFoundException>(() => _branchController.GetById(123));
 
+    }
+
+    [Fact]
+    public async Task AddBranch_ReturnsActionResult_WithBranchToAddDTO()
+    {
+        // Arrange
+        var branchToAdd = new BranchToAddDTO { Name = "NewBranch", Location = "LSA" };
+
+        var addedBranch = new BranchDTO { Id = 1, Name = "NewBranch", Location = "LSA" };
+
+        var mockBranchService = new Mock<IBranchService>();
+
+        mockBranchService
+            .Setup(s => s.AddAsync(It.IsAny<BranchToAddDTO>()))
+            .ReturnsAsync(addedBranch);
+
+        _serviceManger
+            .Setup(s => s.branchService)
+            .Returns(mockBranchService.Object);
+
+        // Act
+        var result = await _branchController.Add(branchToAdd);
+
+        // Assert
+        var actionResult = Assert.IsType<ActionResult<BranchDTO>>(result);
+        var createdResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
+        var returnedDTO = Assert.IsType<BranchDTO>(createdResult.Value);
+
+        Assert.Equal(branchToAdd.Name, returnedDTO.Name);
+        Assert.Equal(branchToAdd.Location, returnedDTO.Location);
     }
 
     [Fact]
