@@ -38,6 +38,9 @@ public class OrdersController(IServiceManager serviceManager) : ControllerBase
     [HasPermission(Permissions.AddOrders)]
     public async Task<ActionResult<AddOrderDTO>> AddOrder(AddOrderDTO DTO)
     {
+        if (DTO is null)
+            return BadRequest("Invalid Order Data!");
+
         var order = await serviceManager.orderService.AddAsync(DTO);
 
         return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);

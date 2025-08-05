@@ -78,6 +78,9 @@ public class OrderService(ILogger<OrderService> logger,
 
         var orders = await unitOfWork.GetOrderRepository().GetOrdersByStatus(status, pramter);
 
+        if (orders is null)
+            throw new NotFoundException(nameof(Order), status.ToString());
+
         var orderDTO = await GetMerchantName(orders);
 
         return orderDTO;
