@@ -1,5 +1,7 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.OpenApi.Models;
 using Serilog;
+using Shipping.API.Filters;
 using Shipping.API.Middlewares;
 
 namespace Shipping.API.Extensions;
@@ -38,6 +40,9 @@ public static class WebApplicationBuilderExtensions
 
         builder.Services.AddScoped<ErrorHandlingMiddleware>();
         builder.Services.AddScoped<RequestTimeLoggingMiddleware>();
+
+        builder.Services.AddTransient<IAuthorizationHandler, PermissionAuthorizationHandler>();
+        builder.Services.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
 
         builder.Host.UseSerilog((context, configuration) =>
         configuration.ReadFrom.Configuration(context.Configuration));
