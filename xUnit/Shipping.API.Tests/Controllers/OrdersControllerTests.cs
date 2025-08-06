@@ -77,10 +77,10 @@ public class OrdersControllerTests
 
         //Assert
         var okResult = Assert.IsType<OkObjectResult>(result.Result);
-        var returnedBranch = Assert.IsType<OrderWithProductsDTO>(okResult.Value);
-        Assert.Equal(1, returnedBranch.Id);
-        Assert.Equal("Pending", returnedBranch.Status);
-        Assert.Equal("Ahmed", returnedBranch.CustomerName);
+        var returnedOrder = Assert.IsType<OrderWithProductsDTO>(okResult.Value);
+        Assert.Equal(1, returnedOrder.Id);
+        Assert.Equal("Pending", returnedOrder.Status);
+        Assert.Equal("Ahmed", returnedOrder.CustomerName);
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public class OrdersControllerTests
     {
         //Arrange
         _serviceManagerMock.Setup(s => s.orderService.GetOrderAsync(123))
-            .ThrowsAsync(new NotFoundException(nameof(Branch), "123"));
+            .ThrowsAsync(new NotFoundException(nameof(Order), "123"));
 
 
         //Assert
